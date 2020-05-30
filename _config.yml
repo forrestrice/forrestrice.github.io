@@ -53,3 +53,13 @@ plugins:
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+remote_theme: thelehhman/plainwhite-jekyll
+
+plainwhite:
+  name: Forrest Rice
+  tagline: Life and other games
+  date_format: "%b %-d, %Y"
+
+  social_links:
+    twitter: Forrest_Rice
+    github: forrestrice
