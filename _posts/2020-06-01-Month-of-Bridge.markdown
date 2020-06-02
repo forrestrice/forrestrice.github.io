@@ -9,8 +9,8 @@ Welcome to the first edition of my newest quarantine project: The Month of Bridg
 
 <iframe
     src="https://player.twitch.tv/?video=v638760462&parent=forrestrice.com&autoplay=false"
-    height="720"
-    width="1280"
+    height="360"
+    width="640"
     frameborder="0"
     scrolling="no"
     allowfullscreen="true">
