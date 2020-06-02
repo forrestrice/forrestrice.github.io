@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Month of Bridge"
-date:   2020-06-01 21:45:09 -0700
+date:   2020-06-01 12:45:09 -0700
 categories: bridge quicktricks
 ---
 
