@@ -15,6 +15,7 @@ Recapped a few hands from last night's club game with a friend. Hands and discus
     height="480"
     width="720"
     allowfullscreen="allowfullscreen">
+    hand1
 </iframe>
 
 > Mark should rebid 3C
