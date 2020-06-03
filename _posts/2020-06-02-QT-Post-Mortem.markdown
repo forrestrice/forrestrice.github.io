@@ -22,12 +22,22 @@ Recapped a few hands from last night's club game with a friend. Hands and discus
 `code word`
 
 <details>
-    <summary>Hand 1</summary>
-    <iframe src="https://mdn-samples.mozilla.org/snippets/html/iframe-simple-contents.html"
-            title="iframe Example 1" width="400" height="300">
-    </iframe>
-    Mark should rebid 3C
-    *italics*
-    ```code block```
-    `code word`
+  <summary>Hand 1</summary>
+  
+  1.Comment
+  
+  <iframe src="https://mdn-samples.mozilla.org/snippets/html/iframe-simple-contents.html"
+            title="iframe Example 1" width="400" height="300"></iframe>
+  
+  ```code block```
+</details>
+
+<details>
+  <summary>Click to expand!</summary>
+  
+  ## Heading
+  1. A numbered
+  2. list
+     * With some
+     * Sub bullets
 </details>
