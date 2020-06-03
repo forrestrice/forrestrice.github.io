@@ -27,7 +27,7 @@ Recapped a few hands from last night's club game with a friend. Hands and discus
   1.Comment
   
   <iframe src="https://mdn-samples.mozilla.org/snippets/html/iframe-simple-contents.html"
-            title="iframe Example 1" width="400" height="300"></iframe>
+            title="iframe Example 1" width="400" height="300">&nbsp; </iframe>
   
   ```code block```
 </details>
