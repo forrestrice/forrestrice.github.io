@@ -20,8 +20,8 @@ This hand in particular introduced an idea that I have encountered before but no
   </summary>
 
 1. Play SA to drop a singleton Q, then finesse
-2. Spade lead implies west does not hold SQ, play for the drop
-3. Opening bid implies E holds remaining HCP, play for the drop
+2. Spade lead implies West does not hold SQ, play for the drop
+3. Opening bid implies East holds remaining HCP, play for the drop
 
 It is tempting to think the finesse is an even chance, and there is nothing you can do about it so you might as well try it. I need to reject that line of thinking and play the hand, not just the suit. There is only a ⅛ chance that East will hold Qx, but that is still a better chance than the finesse in scenarios 2 and 3.
 
