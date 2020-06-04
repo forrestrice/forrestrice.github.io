@@ -53,6 +53,10 @@ plugins:
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+#sitemap: true
+show_excerpts: true
+
 remote_theme: thelehhman/plainwhite-jekyll
 
 plainwhite:
@@ -60,6 +64,13 @@ plainwhite:
   tagline: Life and other games
   date_format: "%b %-d, %Y"
 
+
   social_links:
     twitter: Forrest_Rice
     github: forrestrice
+
+
+#parse markdown details/summary blocks
+kramdown:
+  parse_block_html: true
+
