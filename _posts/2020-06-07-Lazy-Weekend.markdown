@@ -1,3 +1,11 @@
+---
+layout: post
+title:  "Lazy Weekend"
+date:   2020-06-07 12:45:09 -0700
+categories: bridge
+---
+
+
 I did meet my goal of playing bridge bridge every day, but didn't manage to do any studying. On Friday I played ~10 hands with my friend Wes. On Saturday and Sunday I played BBO robot tournaments while attempting to focus on placing opponents high cards using the techniques I discussed earlier this week. Here's an example hand where that came up:
 
 <iframe
