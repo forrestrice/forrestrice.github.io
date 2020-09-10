@@ -387,3 +387,4 @@ there's a simple answer to this :slight_smile:
 i just won't play E for two singletons
 so cash HA
 ```
+</details>
