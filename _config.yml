@@ -61,8 +61,7 @@ plainwhite:
   name: Forrest Rice
   tagline: Life and other games
   date_format: "%b %-d, %Y"
-
-
+  portfolio_image: "assets/portfolio.png"
   social_links:
     twitter: Forrest_Rice
     github: forrestrice
