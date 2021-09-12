@@ -52,7 +52,7 @@ print(f"{Rank.from_str('K')=}")
 ```console
 Direction.from_str('N')=NORTH
 Suit.from_str('C')=CLUBS
-BiddingSuit.from_str('C')=HEARTS
+BiddingSuit.from_str('H')=HEARTS
 Rank.from_str('K')=KING
 ```
 #### Comparison
