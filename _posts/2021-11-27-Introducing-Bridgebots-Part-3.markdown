@@ -44,7 +44,7 @@ As we can see, Bridgebots successfully parsed the deal, bidding, play, and even 
 Bridgebots can also handle multi-board LINs produced by teams matches. For example [this segment](https://www.bridgebase.com/tools/handviewer.html?bbo=y&linurl=https://www.bridgebase.com/tools/vugraph_linfetch.php?id=14502) of the 2010 USBF semi-finals can be downloaded [here](https://www.bridgebase.com/tools/vugraph_linfetch.php?id=14502).
 
 ```python
-lin_multi_path = Path("/Users/frice/PycharmProjects/bridgebotsuser/sample_multi.lin")
+lin_multi_path = Path("path/to/sample_multi.lin")
 results = parse_multi_lin(lin_multi_path)
 print(len(results))
 ```
@@ -91,7 +91,7 @@ import json
 from pathlib import Path
 from bridgebots import DealRecordSchema, parse_single_lin
 
-results = parse_single_lin(Path("/Users/frice/PycharmProjects/bridgebotsuser/sample.lin"))
+results = parse_single_lin(Path("path/to/sample.lin"))
 deal_record_schema = DealRecordSchema(many=True)
 deal_record_json = deal_record_schema.dump(results)
 print(json.dumps(deal_record_json, indent=4))
