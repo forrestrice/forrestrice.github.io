@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Announcing Bridgebots"
+title:  "Introducing Bridgebots Part 1: Suits, Cards, Hands, and Deals"
 date:   2021-09-11 12:45:09 -0700
 categories: bridge bridgebots
 ---
@@ -16,7 +16,7 @@ Today I am pleased to announce the first release of my solution to both these pr
 I'm so glad you asked. Bridgebots is a [MIT Licensed](https://en.wikipedia.org/wiki/MIT_License) collection of libraries and scripts built to aid in the processing of bridge data. It is implemented in python in order to be portable and approachable by a wide range of programmers. Today I will be going over the functionality of [Bridgebots Core](https://github.com/forrestrice/bridge-bots/tree/master/bridgebots), the primary library for parsing and representing bridge data.
 
 ### Getting Started
-As of this writing bridgebots core is on version 0.0.6 and is available on [pypi](https://pypi.org/project/bridgebots/). It requires python 3.7 or later. Begin with a simple:
+As of this writing bridgebots core is on version 0.0.7 and is available on [pypi](https://pypi.org/project/bridgebots/). It requires python 3.8 or later. Begin with a simple:
 
 ```shell
 pip install bridgebots
@@ -31,7 +31,7 @@ In order to process bridge data we need representations for the myriad component
 Bridgebots uses [Enums](https://docs.python.org/3/library/enum.html) to represent these. 
 
 ```python
-from bridgebots.deal_enums import BiddingSuit, Direction, Rank, Suit
+from bridgebots import BiddingSuit, Direction, Rank, Suit
 
 dealer = Direction.EAST
 boss_suit = Suit.SPADES
@@ -43,7 +43,6 @@ lowest_rank = Rank.TWO
 Each comes with helper methods for creation, comparison, or general utility.
 #### Creation
 ```python
-# Relies on python 3.8 f-strings
 print(f"{Direction.from_str('N')=}")
 print(f"{Suit.from_str('C')=}")
 print(f"{BiddingSuit.from_str('H')=}")
@@ -84,14 +83,16 @@ In order to record the bidding and play of a bridge hand we need to combine our 
 
 #### Let Me Give You a Hand
 ```python
-from bridgebots.deal import Card, PlayerHand, Deal
-from bridgebots.deal_enums import Direction, Rank, Suit
+from bridgebots import Card, Deal, Direction, PlayerHand, Rank, Suit
 
 club_nine = Card.from_str("C9")
 diamond_three = Card(Suit.DIAMONDS, Rank.THREE)
 
 south_hand = PlayerHand.from_string_lists(
-    clubs=["K", "8", "7", "4"], diamonds=["A", "T", "4"], hearts=["K", "7", "2"], spades=["K", "3", "2"]
+    spades=["K", "3", "2"],
+    hearts=["K", "7", "2"],
+    diamonds=["A", "T", "4"],
+    clubs=["K", "8", "7", "4"],
 )
 north_card_strings = ["SA", "S5", "HQ", "HT", "H9", "H5", "H4", "DJ", "D3", "D2", "C9", "C6", "C2"]
 north_cards = [Card.from_str(card_str) for card_str in north_card_strings]
@@ -108,8 +109,8 @@ south_hand=PlayerHand(SK S3 S2 | HK H7 H2 | DA DT D4 | CK C8 C7 C4)
 ```
 #### What's Your Deal?
 ```python
-east_hand = PlayerHand.from_string_lists(list("JT5"), list("K9865"), list("J8"), list("Q97"))
-west_hand = PlayerHand.from_string_lists(list("AQ3"), list("Q7"), list("A63"), list("JT864"))
+east_hand = PlayerHand.from_string_lists(list("Q97"), list("J8"), list("K9865"), list("JT5"))
+west_hand = PlayerHand.from_string_lists(list("JT864"), list("A63"), list("Q7"), list("AQ3"))
 deal = Deal(
     dealer=Direction.NORTH,
     ns_vulnerable=False,
