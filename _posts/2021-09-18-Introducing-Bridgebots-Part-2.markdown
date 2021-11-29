@@ -233,7 +233,7 @@ print("boards with slams:", sum(len(dr.board_records) for dr in slam_deal_record
 deals with slams: 42
 boards with slams: 113
 ```
-[Slammin!](https://youtu.be/EWzVJq2mOeg?t=18) 
+[Slammin!](https://youtu.be/mMqMCMcwO8o?t=15) 
 
 That's all for today. Stay tuned for Part III where we will dive into the wonders of more bridge data formats: LIN (used by BBO) and JSON. 
     
