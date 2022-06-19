@@ -1,0 +1,2006 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en-US"><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://forrestrice.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://forrestrice.com/" rel="alternate" type="text/html" hreflang="en-US" /><updated>2022-06-19T00:14:46-07:00</updated><id>https://forrestrice.com/feed.xml</id><title type="html">Forrest Rice</title><subtitle>Journaling explorations of bridge, programming, and the world</subtitle><entry><title type="html">Bridgebots ML: Introduction</title><link href="https://forrestrice.com/posts/Bridgebots-ML-Introduction/" rel="alternate" type="text/html" title="Bridgebots ML: Introduction" /><published>2022-06-18T23:00:09-07:00</published><updated>2022-06-19T00:14:25-07:00</updated><id>https://forrestrice.com/posts/Bridgebots-ML-Introduction</id><content type="html" xml:base="https://forrestrice.com/posts/Bridgebots-ML-Introduction/">&lt;p&gt;I have been interested in applying Machine Learning to Bridge data for a long time; it was one of the original impetuses for building Bridgebots. Over the past few months I have made slow progress towards that goal. Today I would like to make a three-part introduction to that work. The first section will focus on Machine Learning, the second on Bridge, and the third on applying ML to Bridge.&lt;/p&gt;
+
+&lt;h2 id=&quot;machine-learning&quot;&gt;Machine Learning&lt;/h2&gt;
+&lt;p&gt;Machine Learning is a huge field that encompasses many different concepts and techniques. At its core, it is the application of statistics to find patterns in data. Most ML can be categorized as one of the following:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;Supervised Learning&lt;/li&gt;
+  &lt;li&gt;Unsupervised Learning&lt;/li&gt;
+  &lt;li&gt;Reinforcement Learning&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h4 id=&quot;supervised-learning&quot;&gt;Supervised Learning&lt;/h4&gt;
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Supervised_learning&quot;&gt;Supervised Learning&lt;/a&gt; describes tasks for which we have labeled data, and the process of training models to predict those labels. In Bridge data, we might give the model the auction and ask it to predict the number of High Card Points (HCP) held by each player. From historical matches, we have lots of examples we can give the model to learn this relationship. When the model makes an incorrect prediction, we use the label from the training data to instruct the model to update itself to be more accurate in the future. This is accomplished through techniques like &lt;a href=&quot;https://en.wikipedia.org/wiki/Backpropagation&quot;&gt;Backpropagation&lt;/a&gt; and &lt;a href=&quot;https://en.wikipedia.org/wiki/Stochastic_gradient_descent&quot;&gt;Stochastic Gradient Descent&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h4 id=&quot;unsupervised-learning&quot;&gt;Unsupervised Learning&lt;/h4&gt;
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Unsupervised_learning&quot;&gt;Unsupervised Learning&lt;/a&gt; describes finding patterns in unlabeled data. The most common applications are clustering analysis and anomaly detection. For Bridge, we could cluster bidding systems or partnerships together based on auctions or cardplay. Anomaly detection could be used to find highly unusual bids or plays which could be indicative of cheating. Popular techniques include &lt;a href=&quot;https://en.wikipedia.org/wiki/K-means_clustering&quot;&gt;k-means Clustering&lt;/a&gt; and &lt;a href=&quot;https://en.wikipedia.org/wiki/Principal_component_analysis&quot;&gt;Principal Component Analysis&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h4 id=&quot;reinforcement-learning&quot;&gt;Reinforcement Learning&lt;/h4&gt;
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Reinforcement_learning&quot;&gt;Reinforcement Learning&lt;/a&gt; describes the process of teaching an agent how to interact with its environment to maximize reward. It is not supervised learning because the agent is not taught exactly what to do, and it is not unsupervised because the agent is influenced by an outside goal. For Bridge, Reinforcement Learning could be used to teach an agent to bid or play, similar to the techniques that were used to train &lt;a href=&quot;https://en.wikipedia.org/wiki/AlphaGo_Zero&quot;&gt;AlphaGo Zero&lt;/a&gt; and &lt;a href=&quot;https://en.wikipedia.org/wiki/AlphaZero&quot;&gt;AlphaZero&lt;/a&gt; to play Go and Chess at superhuman levels.&lt;/p&gt;
+
+&lt;h3 id=&quot;training-a-supervised-learning-model&quot;&gt;Training a Supervised Learning Model&lt;/h3&gt;
+&lt;p&gt;For my first ML project with Bridgebots I wanted to focus on supervised learning. It is much easier to understand what a model is doing and how it is performing when you have labeled data to check against. The general process for approaching a supervised learning problem looks like this:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;Collect historical data. More data is better, but having clean (error-free) data is generally even more important.&lt;/li&gt;
+  &lt;li&gt;Generate labels that you would like the model to be able to predict, either programmatically or by hand.&lt;/li&gt;
+  &lt;li&gt;Split the data into training, validation, and test sets. There are several ways to approach this, but in general the training set is used to teach the model, the validation set is used to verify that the model has learned the general principles of the problem well (not just memorized the training data), and the test set is used as the final measure of the performance of the model.&lt;/li&gt;
+  &lt;li&gt;Develop features that will be used as inputs to the model. For bridge this might be a representation of the bids that were made, the cards in a player’s hand, the vulnerability, or the players involved.&lt;/li&gt;
+  &lt;li&gt;Train a model to predict the target labels and evaluate its performance.&lt;/li&gt;
+  &lt;li&gt;Iterate over model architectures and model training parameters to improve model performance.&lt;/li&gt;
+  &lt;li&gt;Release a final version of the model which can be used for future predictions.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;bridge&quot;&gt;Bridge&lt;/h2&gt;
+&lt;p&gt;Bridge is a complicated game, and I am assuming most readers of this blog are familiar with the basics. If you are familiar, then feel free to skip this section. If you are not, check out &lt;a href=&quot;https://www.acbl.org/learn/&quot;&gt;this introduction page&lt;/a&gt; from the ACBL or &lt;a href=&quot;https://www.youtube.com/watch?v=2IomnCvxWzM&quot;&gt;this tutorial on youtube&lt;/a&gt; and/or read the below description. Each bridge hand is composed of three sections:&lt;/p&gt;
+
+&lt;h3 id=&quot;the-deal&quot;&gt;The Deal&lt;/h3&gt;
+&lt;p&gt;Two partnerships sit in alternating order (each player across from their partner). Thirteen cards are delt to each player. One player is chosen to start the auction, and each team is assigned a vulnerability. A vulnerable team receives more rewards for making their contracts, but also receives a higher penalty for failing.&lt;/p&gt;
+
+&lt;h3 id=&quot;the-auction&quot;&gt;The Auction&lt;/h3&gt;
+&lt;p&gt;Players compete for the right to name the trump suit for the play of the hand (the trump suit will be stronger than any other suit). At their turn, each player may either pass or raise the stakes of the hand (the number of tricks that must be taken to receive the reward). In general, higher contracts pay better rewards, so players try to bid as high as they safely can. The auction continues until one player makes a bid and the other three all pass. While the premise of the auction is fairly straightforward, in practice it can be incredibly complicated. This is because each partnership assigns special meanings to various sequences of bids, creating a language that is used to communicate information about their hands.&lt;/p&gt;
+
+&lt;h3 id=&quot;the-play&quot;&gt;The Play&lt;/h3&gt;
+&lt;p&gt;The team that won the auction will have one of their players (the declarer) make all the decisions for the rest of the hand. The declarer’s teammate’s hand (the dummy) will be revealed to everyone. This means the declarer has access to perfect information about all their team’s assets, while the defenders have imperfect information, but all of their assets are hidden from declarer. In sequence, each player will play a single card to a trick. Each player must follow the suit of the first card led to the trick. The highest card of that suit will win the trick unless a trump card is played, in which case the highest trump will win. The winner of a trick starts the next trick. If the declarer makes the number of tricks they contracted for in the auction, their team receives a positive score. If they fail, the defenders get the plus score.&lt;/p&gt;
+
+&lt;h2 id=&quot;bridge-ml&quot;&gt;Bridge ML&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/bridge/bridgebots/bridge_nn_with_shared_connections_small.png&quot; alt=&quot;bridge ML logo&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;gathering-data&quot;&gt;Gathering Data&lt;/h3&gt;
+&lt;p&gt;Following the roadmap that I laid out above, the first step to training a supervised learning model is to collect data. There are a few different sites that host bridge data, but for this project I decided to use records from &lt;a href=&quot;https://www.sarantakos.com/bridge/vugraph.html&quot;&gt;The Vugraph Project&lt;/a&gt;. It has records from dozens of high level tournaments across many years of bridge. My hope is that if our models can understand this data, then they will be able to handle a wide variety of bridge situations. The data can be downloaded fairly simply with &lt;a href=&quot;https://www.gnu.org/software/wget/manual/html_node/index.html&quot;&gt;wget&lt;/a&gt; using the &lt;a href=&quot;https://www.gnu.org/software/wget/manual/html_node/Recursive-Retrieval-Options.html&quot;&gt;recursive flag&lt;/a&gt;. The data is in LIN file format; luckily the &lt;a href=&quot;https://github.com/forrestrice/bridge-bots/tree/master/bridgebots&quot;&gt;Bridgebots core library&lt;/a&gt; can already &lt;a href=&quot;/posts/Introducing-Bridgebots-Part-3&quot;&gt;handle that&lt;/a&gt;. I created two datasets - one which can contain the same deal multiple times, and one which has a unique bidding/play record for each deal.&lt;/p&gt;
+
+&lt;p&gt;I have not yet merged the code used in this blog post into the main Bridgebots repository, but you can find it on this &lt;a href=&quot;https://github.com/forrestrice/bridge-bots/tree/vugraph-project-sequence-learning&quot;&gt;branch&lt;/a&gt; or see the diff in this &lt;a href=&quot;https://github.com/forrestrice/bridge-bots/pull/14&quot;&gt;pull request&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;labeling&quot;&gt;Labeling&lt;/h3&gt;
+&lt;p&gt;Now that we have downloaded a few thousand deals, we need to decide which targets we want our model to predict. For my first project, I decided to focus on the auction. At each player’s turn to act, I want to predict three things:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;The next bid.&lt;/li&gt;
+  &lt;li&gt;The number of high card points held by each player.&lt;/li&gt;
+  &lt;li&gt;The shape of each player’s hand.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;I chose these targets because they are important components of playing bridge, and because it is straightforward to programmatically calculate all three of them (unlike e.g. evaluating the wisdom of a given bid). I will discuss the code used to produce these labels in a future post.&lt;/p&gt;
+
+&lt;h3 id=&quot;trainvalidationtest-split&quot;&gt;Train/Validation/Test Split&lt;/h3&gt;
+&lt;p&gt;For now, I am using a simple and standard split of 80% training, 10% validation, and 10% test.&lt;/p&gt;
+
+&lt;h3 id=&quot;model-features&quot;&gt;Model Features&lt;/h3&gt;
+&lt;p&gt;This is another subject where I will go into more detail in the future, but the basic features I included in the model were:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;The auction so far.&lt;/li&gt;
+  &lt;li&gt;The vulnerability.&lt;/li&gt;
+  &lt;li&gt;The position of the current player to act (dealer, dealer + 1, etc).&lt;/li&gt;
+  &lt;li&gt;The cards held by the current player encoded as 52 bit flags.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Features I wrote but have not yet included because I am not sure of their validity in the data yet:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;Which bids were alerted.&lt;/li&gt;
+  &lt;li&gt;Which bids were explained.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;I have also given some thought about how to represent a partnership’s bidding system to the model. My eventual hope is to use &lt;a href=&quot;https://en.wikipedia.org/wiki/Embedding&quot;&gt;embeddings&lt;/a&gt; to allow the model to take specific information about players or systems into account. Alternatively, we could devise a way to pass structured information with the bid (e.g. 3+ clubs, 10+ HCP for an opening of 1C for a partnership playing standard, 16+ HCP for a partnership playing precision). For now, all these models have no knowledge of the players or systems, so they treat every auction the same.&lt;/p&gt;
+
+&lt;h3 id=&quot;model-training-and-iteration&quot;&gt;Model Training and Iteration&lt;/h3&gt;
+&lt;p&gt;I am still in the process of training these models. There are many different techniques and architectures that can be used. The auction is a sequence of actions, so we can use models that specialize in handling sequential data like &lt;a href=&quot;https://en.wikipedia.org/wiki/Long_short-term_memory&quot;&gt;LSTMs&lt;/a&gt; and &lt;a href=&quot;https://en.wikipedia.org/wiki/Transformer_(machine_learning_model)&quot;&gt;Transformers&lt;/a&gt; to make predictions based on the history so far.&lt;/p&gt;
+
+&lt;p&gt;For the task of predicting the next bid, we can use classification metrics to measure the performance of our model. These include &lt;a href=&quot;https://en.wikipedia.org/wiki/Cross_entropy&quot;&gt;categorical crossentropy&lt;/a&gt;, &lt;a href=&quot;https://en.wikipedia.org/wiki/Precision_and_recall&quot;&gt;precision&lt;/a&gt;, and &lt;a href=&quot;https://en.wikipedia.org/wiki/Precision_and_recall&quot;&gt;recall&lt;/a&gt; but there are &lt;a href=&quot;https://en.wikipedia.org/wiki/Evaluation_of_binary_classifiers&quot;&gt;many more&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;For the task of predicting the players’ shapes or HCP, we can use a regression based model. This will predict some average value (e.g. median or mean depending on the loss function used during training), but we could also augment the model to predict other aspects of the target distribution (e.g. standard deviation could tell us how wide of a range of HCP is expected for a bid).&lt;/p&gt;
+
+&lt;p&gt;For this work I used &lt;a href=&quot;https://www.tensorflow.org/&quot;&gt;Tensorflow&lt;/a&gt;, a popular Machine Learning library developed by Google.&lt;/p&gt;
+
+&lt;h3 id=&quot;releasing-a-model&quot;&gt;Releasing a Model&lt;/h3&gt;
+&lt;p&gt;I spent some time building a saving/loading mechanism that will bundle the features needed by the model with the model internals (weights + structure). A user can download these models and run them locally using the Bridgebots Python library. These models are far from perfect, but as you will see below, they already have some promise. Even when they are not provided with any system/partnership information, they make fairly reasonable predictions about the auction and holdings of the players. Like the rest of Bridgebots, the models and the code used to train them are being released under the &lt;a href=&quot;https://en.wikipedia.org/wiki/MIT_License&quot;&gt;MIT Open Source License&lt;/a&gt;, which means they will be freely available for anyone to use or modify.&lt;/p&gt;
+
+&lt;h2 id=&quot;examples&quot;&gt;Examples&lt;/h2&gt;
+&lt;p&gt;I have published the first generation of these models to a &lt;a href=&quot;https://console.cloud.google.com/storage/browser/bridgebots-public;tab=objects?prefix=&amp;amp;forceOnObjectsSortingFiltering=false&quot;&gt;public GCP storage bucket&lt;/a&gt;, and I built an example &lt;a href=&quot;https://colab.research.google.com/drive/1DoW2cVw8IBS5DoOgajcVd-jD4p785pIP?usp=sharing&quot;&gt;Google Colab notebook&lt;/a&gt; which shows how they can be loaded and run.&lt;/p&gt;
+
+&lt;h3 id=&quot;loading-the-model&quot;&gt;Loading the Model&lt;/h3&gt;
+&lt;p&gt;The models can be loaded by installing the bridgebots-sequence package.&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;pip &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;bridgebots-sequence
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Then an “Inference Engine” can be created from the saved model data:&lt;/p&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;pathlib&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Path&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;bridgebots_sequence.inference&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BiddingInferenceEngine&lt;/span&gt;
+
+
+&lt;span class=&quot;n&quot;&gt;hcp_engine&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BiddingInferenceEngine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;model_path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;./bridgebots-public/bid_learn/gen_1/hcp/&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;running-the-model&quot;&gt;Running the Model&lt;/h3&gt;
+&lt;p&gt;Each model needs inputs in order to make predictions. This information should be provided in the form of Bridgebots representations of cardinal directions, cards, and bids. For example:&lt;/p&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;bridgebots&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Card&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Direction&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;dealer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SOUTH&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;dealer_vulnerable&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;dealer_opp_vulnerable&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;player_holding&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Card&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;from_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;S7&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;S2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;HA&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;HJ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;H9&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;H2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;DK&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;DJ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;D2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;CA&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;CQ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;CJ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;C4&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;bidding_record&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;1S&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;PASS&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;2C&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;PASS&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;2H&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;PASS&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;3H&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;PASS&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;3S&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;PASS&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;4D&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;X&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;PASS&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;PASS&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;bidding_metadata&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;&quot;Predicted hcp:&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;hcp_engine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;predict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;dealer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dealer_vulnerable&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dealer_opp_vulnerable&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;player_holding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bidding_record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bidding_metadata&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;Predicted hcp:
+ {SOUTH: 12.845368, WEST: 4.947876, NORTH: 15.906226, EAST: 6.1790986}
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;evaluating-the-models&quot;&gt;Evaluating the Models&lt;/h3&gt;
+&lt;p&gt;At the risk of repeating myself, the technical details of the model evaluation is something I will write up in more detail later. However, I will provide some examples of the model predictions below, and I have set up a &lt;a href=&quot;https://colab.research.google.com/drive/1DoW2cVw8IBS5DoOgajcVd-jD4p785pIP?usp=sharing&quot;&gt;Google Colab notebook&lt;/a&gt; so that anybody can try the models for themselves. For these examples, I chose to look at &lt;a href=&quot;https://www.bridgebase.com/tools/handviewer.html?bbo=y&amp;amp;linurl=https://www.bridgebase.com/tools/vugraph_linfetch.php?id=74272&quot;&gt;this segment&lt;/a&gt; of the &lt;a href=&quot;http://www.worldbridge.org/competitions/wbf-championships/world-bridge-teams-championships/dorsi-seniors-trophy/&quot;&gt;2022 d’Orsi&lt;/a&gt; between the USA and India. For each of these hands, we will “replace” one of the players with the models and see how they would evaluate the auction. That means that only 13 of the 52 cards are provided as input.&lt;/p&gt;
+
+&lt;h4 id=&quot;board-24&quot;&gt;Board 24&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/bridge/bridgebots/dot_24.png&quot; alt=&quot;board 24&quot; /&gt;
+The model evaluates the board from the perspective of Meckstroth after the auction reaches 2SX:&lt;/p&gt;
+&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;NORTH - HCP:12.056150436401367, Shape:[1.8675611 3.1290896 3.823617  4.12866  ]
+EAST - HCP:7.969760894775391, Shape:[3.3415089 3.3108985 3.2528265 3.0557857]
+SOUTH - HCP:12.726337432861328, Shape:[2.9363637 3.3428063 3.112618  3.529826 ]
+WEST - HCP:7.195767402648926, Shape:[4.8077374 3.1735537 2.7231622 2.2366753]
+Predicted bid: 3C
+Predicted bid probabilities:[('3C', 0.27392504), ('2NT', 0.2338383), ('3D', 0.18260154), ('PASS', 0.10459597), ('3H', 0.06501402)]
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;The model did well understanding that West held spades after they opened a multi 2D, and that North would bid 3C (27%) or 2NT (23%), both of which were suggested by the commentators. The model struggled with the fact that East’s 2S actually showed a preference for hearts, and overestimated South’s strength.&lt;/p&gt;
+
+&lt;h3 id=&quot;board-31&quot;&gt;Board 31&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/bridge/bridgebots/dot_31.png&quot; alt=&quot;board 31&quot; /&gt;
+Let’s look at what the model thought was going on at each of Meckstroth’s calls.&lt;/p&gt;
+
+&lt;p&gt;After &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[&quot;1S&quot;, &quot;PASS&quot;]&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;NORTH - HCP:15.839217185974121, Shape:[2.021296  3.9838076 3.0657048 4.007261 ]
+EAST - HCP:5.896975994110107, Shape:[2.8044546 3.5252647 3.7001972 3.08169  ]
+SOUTH - HCP:12.090693473815918, Shape:[5.4067245 2.3355904 2.9286385 2.4316034]
+WEST - HCP:6.003118991851807, Shape:[2.8464196 3.2721624 3.4069438 3.5730052]
+Predicted bid: 2C
+Predicted bid probabilities:[('2C', 0.4598667), ('2NT', 0.2520364), ('2H', 0.12931933), ('2D', 0.07926174)]
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;After &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[&quot;1S&quot;, &quot;PASS&quot;, &quot;2C&quot;, &quot;PASS&quot;, &quot;2H&quot;, &quot;PASS&quot;]&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;NORTH - HCP:16.015335083007812, Shape:[2.015837  3.9580772 3.071818  4.0097213]
+EAST - HCP:5.516820907592773, Shape:[3.0574307 3.0101004 3.9873986 3.0293846]
+SOUTH - HCP:12.106705665588379, Shape:[4.9549217 3.3470654 2.5047426 2.2745743]
+WEST - HCP:6.300617694854736, Shape:[3.0348947 2.7714062 3.5119736 3.7505522]
+Predicted bid: 2NT
+Predicted bid probabilities:[('2NT', 0.40432608), ('3H', 0.20415133), ('4H', 0.09077729), ('3C', 0.05689908), ('2S', 0.053402733)]
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;After &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[&quot;1S&quot;, &quot;PASS&quot;, &quot;2C&quot;, &quot;PASS&quot;, &quot;2H&quot;, &quot;PASS&quot;, &quot;3H&quot;, &quot;PASS&quot;, &quot;3S&quot;, &quot;PASS&quot;]&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;NORTH - HCP:16.078683853149414, Shape:[1.9772431 4.0498543 2.9730036 4.0501876]
+EAST - HCP:5.4062113761901855, Shape:[3.059058  2.6944509 4.2516003 3.0805616]
+SOUTH - HCP:12.723127365112305, Shape:[4.9007063 3.614962  2.5420392 2.0281525]
+WEST - HCP:5.835963726043701, Shape:[3.1310077 2.736113  3.3029883 3.9128149]
+Predicted bid: 4C
+Predicted bid probabilities:[('4C', 0.50220186), ('3NT', 0.23680453), ('4NT', 0.08573343), ('4D', 0.06225779), ('4H', 0.06137136)]
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;After &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[&quot;1S&quot;, &quot;PASS&quot;, &quot;2C&quot;, &quot;PASS&quot;, &quot;2H&quot;, &quot;PASS&quot;, &quot;3H&quot;, &quot;PASS&quot;, &quot;3S&quot;, &quot;PASS&quot;, &quot;4D&quot;, &quot;X&quot;, &quot;PASS&quot;, &quot;PASS&quot;]&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;NORTH - HCP:15.906225204467773, Shape:[1.9650984 4.0142136 2.962     4.0986676]
+EAST - HCP:6.1790995597839355, Shape:[2.93841   2.4142017 4.4957485 3.230924 ]
+SOUTH - HCP:12.84537124633789, Shape:[5.094196  3.867588  2.5129228 1.612994 ]
+WEST - HCP:4.947877407073975, Shape:[3.0642023 2.8014474 3.0946152 4.124716 ]
+Predicted bid: XX
+Predicted bid probabilities:[('XX', 0.9760938)]
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The model quickly recognized an opening spade bid in terms of shape and strength, and predicted the 2/1 auction. It adjusted its belief about South’s shape after the 2H rebid, but probably not as much as we would want, since this almost always shows 4+. It also missed that North would raise hearts (this could be related to the incorrect prediction about shape), and overemphasized the likelihood of redoubling at Meckstroth’s last call. Overall we can see the model could still be improved a lot, but its predictions are at least in the right neighborhood for many aspects of the hand.&lt;/p&gt;
+
+&lt;h4 id=&quot;board-18&quot;&gt;Board 18&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/bridge/bridgebots/dot_18.png&quot; alt=&quot;board 18&quot; /&gt;
+Lets do the same step by step evaluation for Saha on Board 18.&lt;/p&gt;
+
+&lt;p&gt;After &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[&quot;PASS&quot;, &quot;1C&quot;]&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;NORTH - HCP:8.551470756530762, Shape:[3.9040601 3.1166744 3.1397586 2.8878965]
+EAST - HCP:6.108532428741455, Shape:[3.74385   2.9586966 3.2413125 3.0909529]
+SOUTH - HCP:14.163474082946777, Shape:[3.381772  3.0403666 2.552261  4.079942 ]
+WEST - HCP:10.894444465637207, Shape:[2.0130272 3.9442337 4.1041923 2.9768863]
+Predicted bid: PASS
+Predicted bid probabilities:[('PASS', 0.42284918), ('1H', 0.30451122), ('1D', 0.15629105), ('X', 0.06527666)]
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;After &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;['PASS', '1C', 'PASS', '3C', 'X', 'PASS']&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;NORTH - HCP:7.928995132446289, Shape:[2.6428466 2.4678926 3.2113147 4.795836 ]
+EAST - HCP:7.6490960121154785, Shape:[4.353987  3.5895529 3.3248572 1.8434293]
+SOUTH - HCP:13.27055835723877, Shape:[4.0041056 3.0925465 2.5056815 3.5044522]
+WEST - HCP:10.901622772216797, Shape:[2.0748663 3.9804525 4.0774617 2.9409585]
+Predicted bid: 3H
+Predicted bid probabilities:[('3H', 0.46870205), ('4H', 0.3312904), ('3D', 0.06510229)]
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Nice job on this one! The model correctly assessed that Saha would pass and then bid 3H. It also understood that North had long clubs with less than invitational values, and that East had length in the other suits. It likely predicted that East’s spades were longer because we provided West’s hand (which has four hearts, four diamonds, and only two spades) as an input. The final HCP predictions are just about right as well!&lt;/p&gt;
+
+&lt;h2 id=&quot;wrapping-up&quot;&gt;Wrapping Up&lt;/h2&gt;
+&lt;p&gt;Thanks for following along! I hope you now find the possibilities of applying ML to Bridge as exciting as I do. If you are interested in how these models were trained or even in training some models of your own, stay tuned - I have a lot more to show you!&lt;/p&gt;</content><author><name></name></author><category term="bridge" /><category term="bridgebots" /><category term="machine-learning" /><summary type="html">I have been interested in applying Machine Learning to Bridge data for a long time; it was one of the original impetuses for building Bridgebots. Over the past few months I have made slow progress towards that goal. Today I would like to make a three-part introduction to that work. The first section will focus on Machine Learning, the second on Bridge, and the third on applying ML to Bridge.</summary></entry><entry><title type="html">Bridgebots Tools: CSV Report</title><link href="https://forrestrice.com/posts/Bridgebots-Tools/" rel="alternate" type="text/html" title="Bridgebots Tools: CSV Report" /><published>2022-01-30T10:05:09-08:00</published><updated>2022-01-30T10:05:09-08:00</updated><id>https://forrestrice.com/posts/Bridgebots-Tools</id><content type="html" xml:base="https://forrestrice.com/posts/Bridgebots-Tools/">&lt;p&gt;I enjoy participating in the &lt;a href=&quot;https://groups.io/g/bridge-dev&quot;&gt;bridge-dev&lt;/a&gt; mailing list. There are a lot of cool ideas and discussions happening about building software for bridge. Recently, another group member reached out with questions about Bridgebots. They wanted to know if it would be possible to create a Comma Separated Values (CSV) report of LIN files for easier search and analysis of records. This seemed like a great way to build upon the work I’ve already done to support LIN and PBN parsing, so I started building. The result is the first release of the &lt;a href=&quot;https://github.com/forrestrice/bridge-bots/tree/master/tools&quot;&gt;bridgebots_tools&lt;/a&gt; package. For now the CSV report is the only tool, but I hope to add more in the future.&lt;/p&gt;
+
+&lt;h2 id=&quot;getting-started&quot;&gt;Getting Started&lt;/h2&gt;
+&lt;p&gt;The tools package will contain mostly useful scripts and/or command-line utilities. This means there are a couple ways it can be used. For basic usage, I would recommend installing the package with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pip install bridgebots_tools&lt;/code&gt; and then executing it as a module with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;python -m bridgebots_tools.csv_report&lt;/code&gt;. If you want to edit the script (to add or remove output fields, for example) then you may prefer to download the source from github. The dependencies for the script (&lt;a href=&quot;https://github.com/forrestrice/bridge-bots/tree/master/bridgebots&quot;&gt;bridgebots core&lt;/a&gt; and &lt;a href=&quot;https://click.palletsprojects.com/en/8.0.x/&quot;&gt;click&lt;/a&gt;) can be installed manually or with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;poetry install&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;report&quot;&gt;Report!&lt;/h2&gt;
+&lt;p&gt;The csv_report tool takes in a bridge record file (PBN or LIN format) or directory of files and creates a report CSV. There are several input and output configuration options, and you can read all about them in the &lt;a href=&quot;https://github.com/forrestrice/bridge-bots/blob/master/tools/README.md&quot;&gt;Readme&lt;/a&gt;. Here are a couple examples of how to run the report. Let’s say we’re interested in analyzing the 2019 Spingold Final. We can start by analyzing a &lt;a href=&quot;https://www.bridgebase.com/tools/handviewer.html?linurl=https://www.bridgebase.com/tools/vugraph_linfetch.php?id=64787&quot;&gt;single segment&lt;/a&gt;. You can find the download link by searching for “spingold” in the &lt;a href=&quot;https://www.bridgebase.com/vugraph_archives/vugraph_archives.php?v3b=&quot;&gt;BBO vugraph archive&lt;/a&gt;. For simplicity I have also uploaded all the examples to a public &lt;a href=&quot;https://drive.google.com/drive/folders/1hOQlNl7Ld9e6Ms8DbZEeUyDWl9il9Ikd?usp=sharing&quot;&gt;google drive folder&lt;/a&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;go&quot;&gt;python -m bridgebots_tools.csv_report bridgebots_tools_example/64787.lin bridgebots_tools_example/64787.csv
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;The team results CSV can be viewed on &lt;a href=&quot;https://docs.google.com/spreadsheets/d/1UgL_Oe4R4g_4lEgeDuYkFp8VZoPNy9AJjfq_VJYirIc/edit?usp=sharing&quot;&gt;google sheets&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Now let’s analyze all the segments of the finals, and list the boards in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;individual&lt;/code&gt; format (one row per board instead of one row per board pair).&lt;/p&gt;
+
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;go&quot;&gt;python -m bridgebots_tools.csv_report --output_format=individual bridgebots_tools_example/ bridgebots_tools_example/spingold_finals_all.csv
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;All 120 boards can now be analyzed. Check out the results on &lt;a href=&quot;https://docs.google.com/spreadsheets/d/1_Iplmjc7-ipEED0qGOXiTc9iFpGj7zQE4qtbW5Eem7M/edit?usp=sharing&quot;&gt;google sheets&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;analysis&quot;&gt;Analysis&lt;/h2&gt;
+&lt;p&gt;Now that the data has been exported to CSV, there a variety of ways we could continue our analysis. We could import the data to a tool like pandas, or we could filter, aggregate, and graph the data inside of excel or sheets. Here are some examples of what you might try:&lt;/p&gt;
+
+&lt;p&gt;A histogram of the HCP held by whoever opened the bidding:
+&lt;img src=&quot;/assets/bridge/bridgebots/histogram_of_opener_hcp.png&quot; alt=&quot;histogram_of_opener_hcp.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The relationship between opening HCP and opening seat:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/bridge/bridgebots/opener_hcp_vs_opener.png&quot; alt=&quot;opener_hcp_vs_opener.png.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The relationship between opening HCP and the final score for opener:
+&lt;img src=&quot;/assets/bridge/bridgebots/opener_score_vs_opener_hcp.png&quot; alt=&quot;opener_score_vs_opener_hcp.png&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;building-a-toolbox&quot;&gt;Building a Toolbox&lt;/h2&gt;
+&lt;p&gt;It was fun to build a tool on top of Bridgebots to help meet the analysis goals of other bridge players. In the future, I would like to expand the toolbox to include features like automated BBO history downloads and Double Dummy Analysis. If you have ideas for improvements or new tools to build, please reach out!&lt;/p&gt;</content><author><name></name></author><category term="bridge" /><category term="bridgebots" /><summary type="html">I enjoy participating in the bridge-dev mailing list. There are a lot of cool ideas and discussions happening about building software for bridge. Recently, another group member reached out with questions about Bridgebots. They wanted to know if it would be possible to create a Comma Separated Values (CSV) report of LIN files for easier search and analysis of records. This seemed like a great way to build upon the work I’ve already done to support LIN and PBN parsing, so I started building. The result is the first release of the bridgebots_tools package. For now the CSV report is the only tool, but I hope to add more in the future.</summary></entry><entry><title type="html">Introducing Bridgebots Part 3: LIN files and JSON</title><link href="https://forrestrice.com/posts/Introducing-Bridgebots-Part-3/" rel="alternate" type="text/html" title="Introducing Bridgebots Part 3: LIN files and JSON" /><published>2021-11-27T11:45:09-08:00</published><updated>2021-11-28T00:26:43-08:00</updated><id>https://forrestrice.com/posts/Introducing-Bridgebots-Part-3</id><content type="html" xml:base="https://forrestrice.com/posts/Introducing-Bridgebots-Part-3/">&lt;p&gt;In my &lt;a href=&quot;/posts/Introducing-Bridgebots-Part-2&quot;&gt;last post&lt;/a&gt; I covered how &lt;a href=&quot;https://github.com/forrestrice/bridge-bots&quot;&gt;Bridgebots&lt;/a&gt; records the auction and the play of the hand, and how it can be used to import and analyze results from PBN files. Today we will expand that functionality to LIN and JSON files, and your long-winded introduction to Bridgebots will be complete!&lt;/p&gt;
+
+&lt;h3 id=&quot;linsanity&quot;&gt;LINsanity&lt;/h3&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.bridgebase.com&quot;&gt;Bridge Base Online&lt;/a&gt;(BBO) is a popular site for playing bridge both competitively and casually. One of its greatest features is the history it saves for each user and tournament. Here are some helpful places to find these:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.bridgebase.com/myhands/index.php?&amp;amp;from_login=0&quot;&gt;Player Hand Records &lt;/a&gt; (requires account)&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.bridgebase.com/vugraph_archives/vugraph_archives.php&quot;&gt;Vugraph Archives&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.bridgebase.com/tourneyhistory/&quot;&gt;Recent Tournaments&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;BBO provides an interactive &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Movie&lt;/code&gt; viewing option or a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Lin&lt;/code&gt; file for download. I don’t actually know what LIN stands for (if you do let me know!). It contains all the juicy details we need to record the play of a bridge hand, but it takes a little bit of puzzling to figure out what each part means. Here’s an example:&lt;/p&gt;
+
+&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;pn|SBlumlein,Forrest_,grychn48,granola357|st||md|2S9HJ872DQT64CQJ43,SAK2HA95DAJ875C92,SQ765HKQ64D32CAK6,|rh||ah|Board 12|sv|n|mb|1N|an|15-17|mb|p|mb|2H|an|spades |mb|p|mb|2S|mb|p|mb|p|mb|p|pg||pc|CA|pc|C5|pc|C4|pc|C2|pg||pc|CK|pc|C7|pc|C3|pc|C9|pg||pc|C6|pc|CT|pc|CJ|pc|S2|pg||pc|SA|pc|S5|pc|S3|pc|S9|pg||pc|SK|pc|S6|pc|S4|pc|D4|pg||pc|D5|pc|D3|pc|DK|pc|D6|pg||pc|D9|pc|DQ|pc|DA|pc|D2|pg||pc|DJ|pc|S7|pc|S8|pc|DT|pg||pc|H3|pc|H2|pc|HA|pc|H4|pg||pc|D8|pc|SQ|pc|HT|pc|H7|pg||pc|HK|pc|ST|pc|H8|pc|H5|pg||pc|SJ|pc|HJ|pc|H9|pc|H6|pg||pc|C8|pc|CQ|pc|D7|pc|HQ|pg||
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.bridgebase.com/tools/handviewer.html?bbo=y&amp;amp;lin=pn|SBlumlein,Forrest_,grychn48,granola357|st%7C%7Cmd%7C2S9HJ872DQT64CQJ43%2CSAK2HA95DAJ875C92%2CSQ765HKQ64D32CAK6%2C%7Crh%7C%7Cah%7CBoard%2012%7Csv%7Cn%7Cmb%7C1N%7Can%7C15-17%7Cmb%7Cp%7Cmb%7C2H%7Can%7Cspades%20%7Cmb%7Cp%7Cmb%7C2S%7Cmb%7Cp%7Cmb%7Cp%7Cmb%7Cp%7Cpc%7CCA%7Cpc%7CC5%7Cpc%7CC4%7Cpc%7CC2%7Cpc%7CCK%7Cpc%7CC7%7Cpc%7CC3%7Cpc%7CC9%7Cpc%7CC6%7Cpc%7CCT%7Cpc%7CCJ%7Cpc%7CS2%7Cpc%7CSA%7Cpc%7CS5%7Cpc%7CS3%7Cpc%7CS9%7Cpc%7CSK%7Cpc%7CS6%7Cpc%7CS4%7Cpc%7CD4%7Cpc%7CD5%7Cpc%7CD3%7Cpc%7CDK%7Cpc%7CD6%7Cpc%7CD9%7Cpc%7CDQ%7Cpc%7CDA%7Cpc%7CD2%7Cpc%7CDJ%7Cpc%7CS7%7Cpc%7CS8%7Cpc%7CDT%7Cpc%7CH3%7Cpc%7CH2%7Cpc%7CHA%7Cpc%7CH4%7Cpc%7CD8%7Cpc%7CSQ%7Cpc%7CHT%7Cpc%7CH7%7Cpc%7CHK%7Cpc%7CST%7Cpc%7CH8%7Cpc%7CH5%7Cpc%7CSJ%7Cpc%7CHJ%7Cpc%7CH9%7Cpc%7CH6%7Cpc%7CC8%7Cpc%7CCQ%7Cpc%7CD7%7Cpc%7CHQ%7C&quot;&gt;BBO movie for reference&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Parsing it visually we can see the player names, the hands (well three of them), the board number, the vulnerability, the auction, and the play of the hand. LIN files suffer from some of the same issues that afflict PBNs: they are fairly human-readable but they are non-trivial to consume programmatically. Luckily Bridgebots can help us out!&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;pathlib&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Path&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;bridgebots&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;parse_multi_lin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;parse_single_lin&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;lin_path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;path/to/above/example.lin&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;results&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;parse_single_lin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lin_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;results&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;go&quot;&gt;[DealRecord(deal=Deal(
+	dealer=Direction.WEST, ns_vulnerable=True, ew_vulnerable=False
+	North: PlayerHand(SQ S7 S6 S5 | HK HQ H6 H4 | D3 D2 | CA CK C6)
+	South: PlayerHand(S9 | HJ H8 H7 H2 | DQ DT D6 D4 | CQ CJ C4 C3)
+	East: PlayerHand(SJ ST S8 S4 S3 | HT H3 | DK D9 | CT C8 C7 C5)
+	West: PlayerHand(SA SK S2 | HA H9 H5 | DA DJ D8 D7 D5 | C9 C2)
+), board_records=[BoardRecord(bidding_record=['1NT', 'PASS', '2H', 'PASS', '2S', 'PASS', 'PASS', 'PASS'], raw_bidding_record=['1N', 'p', '2H', 'p', '2S', 'p', 'p', 'p'], play_record=[CA, C5, C4, C2, CK, C7, C3, C9, C6, CT, CJ, S2, SA, S5, S3, S9, SK, S6, S4, D4, D5, D3, DK, D6, D9, DQ, DA, D2, DJ, S7, S8, DT, H3, H2, HA, H4, D8, SQ, HT, H7, HK, ST, H8, H5, SJ, HJ, H9, H6, C8, CQ, D7, HQ], declarer=WEST, contract=Contract(level=2, suit=SPADES, doubled=0), tricks=9, scoring=None, names={SOUTH: 'SBlumlein', WEST: 'Forrest_', NORTH: 'grychn48', EAST: 'granola357'}, date=None, event=None, bidding_metadata=[BidMetadata(bid_index=0, bid='1NT', alerted=False, explanation='15-17'), BidMetadata(bid_index=2, bid='2H', alerted=False, explanation='spades ')], commentary=None, score=140)])]
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;As we can see, Bridgebots successfully parsed the deal, bidding, play, and even included the alerts and explanations!&lt;/p&gt;
+
+&lt;p&gt;Bridgebots can also handle multi-board LINs produced by teams matches. For example &lt;a href=&quot;https://www.bridgebase.com/tools/handviewer.html?bbo=y&amp;amp;linurl=https://www.bridgebase.com/tools/vugraph_linfetch.php?id=14502&quot;&gt;this segment&lt;/a&gt; of the 2010 USBF semi-finals can be downloaded &lt;a href=&quot;https://www.bridgebase.com/tools/vugraph_linfetch.php?id=14502&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;n&quot;&gt;lin_multi_path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;path/to/sample_multi.lin&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;results&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;parse_multi_lin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lin_multi_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;results&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;go&quot;&gt;15
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;results&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;board_records&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;go&quot;&gt;BoardRecord(bidding_record=['1H', 'PASS', '3C', 'PASS', '4H', 'PASS', 'PASS', 'PASS'], raw_bidding_record=['1H', 'p', '3C!', 'p', '4H', 'p', 'p', 'p'], play_record=[C2, C3, CA, CJ, D7, D5, DA, D4, D6, DQ, D9, D3, C9, C4, CK, C5, H2, H9, HA, H5], declarer=EAST, contract=Contract(level=4, suit=HEARTS, doubled=0), tricks=10, scoring=None, names={SOUTH: 'Meckstroth', WEST: 'Levin', NORTH: 'Rodwell', EAST: 'Weinstein'}, date=None, event=None, bidding_metadata=[BidMetadata(bid_index=2, bid='3C', alerted=True, explanation='jacoby 2N')], commentary=[Commentary(bid_index=1, play_index=None, comment='caitlin: Hi all'), Commentary(bid_index=1, play_index=None, comment='vugraphzfk: Hi everyone and welcome back, this is the last segment for today'), Commentary(bid_index=1, play_index=None, comment='ahollan1: same boards played in both Semi-Final matches   use http://www.bbotv.com/vugraph/   to spy on all tables'), Commentary(bid_index=None, play_index=3, comment='ahollan1: ACBL Convention Cards for all Fleisher Team  http://usbf.org/index.php?option=com_content&amp;amp;task=view&amp;amp;id=659&amp;amp;Itemid=284'), Commentary(bid_index=None, play_index=3, comment='vdoubleu: Good ---1 quick hand down'), Commentary(bid_index=None, play_index=3, comment='ahollan1: ACBL CC and WBF CC from 2009 Bermuda Bowl for Nickell team at http://usbf.org/index.php?option=com_content&amp;amp;task=view&amp;amp;id=655&amp;amp;Itemid=284'), Commentary(bid_index=None, play_index=11, comment='vugraphzfk: you jinxed it, Val'), Commentary(bid_index=None, play_index=11, comment='vdoubleu: I noticed:-)')], score=420)
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Bridgebots gives us all its usual goodness and also includes the expert commentary for your (and your computer’s) viewing pleasure.&lt;/p&gt;
+
+&lt;p&gt;Finally, Bridgebots also includes the ability to create LIN strings and URLs from DealRecords. Let’s load up our example Cavendish Pairs PBN from &lt;a href=&quot;/posts/Introducing-Bridgebots-Part-2/&quot;&gt;Part 2&lt;/a&gt; and take a look at it with the BBO interactive viewer!&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;pathlib&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Path&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;bridgebots&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;build_lin_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;build_lin_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;parse_pbn&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;pbn_path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;path/to/cavendish.pbn&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;results&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;parse_pbn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pbn_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;build_lin_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;results&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;results&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;board_records&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;go&quot;&gt;pn|,,,|st||md|4SA954HAT98DQ8C875,S63HK3DK9532CJ963,ST82H62DT764CKQ42,SKQJ7HQJ754DAJCAT|sv|b|mb|1H|mb|p|mb|1S|an|0-4 !ss|mb|p|mb|2C!|mb|p|mb|2H|an|less than 8 points|mb|p|mb|2S|an|17+ with 4 !S|mb|p|mb|3N|mb|p|mb|p|mb|p|pg||pc|CQ|pc|CA|pc|C8|pc|C3|pg||pc|H4|pc|HT|pc|HK|pc|H6|pg||pc|H3|pc|H2|pc|HQ|pc|HA|pg||pc|C5|pc|C6|pc|CK|pc|CT|pg||pc|D4|pc|DJ|pc|DQ|pc|DK|pg||pc|CJ|pc|C2|pc|S7|pc|C7|pg||pc|C9|pc|C4|pc|H5|pc|S4|pg||pc|S6|mc|9|pg||
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;build_lin_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;results&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;results&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;board_records&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;go&quot;&gt;https://www.bridgebase.com/tools/handviewer.html?lin=pn%7C%2C%2C%2C%7Cst%7C%7Cmd%7C4SA954HAT98DQ8C875%2CS63HK3DK9532CJ963%2CST82H62DT764CKQ42%2CSKQJ7HQJ754DAJCAT%7Csv%7Cb%7Cmb%7C1H%7Cmb%7Cp%7Cmb%7C1S%7Can%7C0-4+%21ss%7Cmb%7Cp%7Cmb%7C2C%21%7Cmb%7Cp%7Cmb%7C2H%7Can%7Cless+than+8+points%7Cmb%7Cp%7Cmb%7C2S%7Can%7C17%2B+with+4+%21S%7Cmb%7Cp%7Cmb%7C3N%7Cmb%7Cp%7Cmb%7Cp%7Cmb%7Cp%7Cpg%7C%7Cpc%7CCQ%7Cpc%7CCA%7Cpc%7CC8%7Cpc%7CC3%7Cpg%7C%7Cpc%7CH4%7Cpc%7CHT%7Cpc%7CHK%7Cpc%7CH6%7Cpg%7C%7Cpc%7CH3%7Cpc%7CH2%7Cpc%7CHQ%7Cpc%7CHA%7Cpg%7C%7Cpc%7CC5%7Cpc%7CC6%7Cpc%7CCK%7Cpc%7CCT%7Cpg%7C%7Cpc%7CD4%7Cpc%7CDJ%7Cpc%7CDQ%7Cpc%7CDK%7Cpg%7C%7Cpc%7CCJ%7Cpc%7CC2%7Cpc%7CS7%7Cpc%7CC7%7Cpg%7C%7Cpc%7CC9%7Cpc%7CC4%7Cpc%7CH5%7Cpc%7CS4%7Cpg%7C%7Cpc%7CS6%7Cmc%7C9%7Cpg%7C%7C
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Click &lt;a href=&quot;https://www.bridgebase.com/tools/handviewer.html?lin=pn%7C%2C%2C%2C%7Cst%7C%7Cmd%7C4SA954HAT98DQ8C875%2CS63HK3DK9532CJ963%2CST82H62DT764CKQ42%2CSKQJ7HQJ754DAJCAT%7Csv%7Cb%7Cmb%7C1H%7Cmb%7Cp%7Cmb%7C1S%7Can%7C0-4+%21ss%7Cmb%7Cp%7Cmb%7C2C%21%7Cmb%7Cp%7Cmb%7C2H%7Can%7Cless+than+8+points%7Cmb%7Cp%7Cmb%7C2S%7Can%7C17%2B+with+4+%21S%7Cmb%7Cp%7Cmb%7C3N%7Cmb%7Cp%7Cmb%7Cp%7Cmb%7Cp%7Cpg%7C%7Cpc%7CCQ%7Cpc%7CCA%7Cpc%7CC8%7Cpc%7CC3%7Cpg%7C%7Cpc%7CH4%7Cpc%7CHT%7Cpc%7CHK%7Cpc%7CH6%7Cpg%7C%7Cpc%7CH3%7Cpc%7CH2%7Cpc%7CHQ%7Cpc%7CHA%7Cpg%7C%7Cpc%7CC5%7Cpc%7CC6%7Cpc%7CCK%7Cpc%7CCT%7Cpg%7C%7Cpc%7CD4%7Cpc%7CDJ%7Cpc%7CDQ%7Cpc%7CDK%7Cpg%7C%7Cpc%7CCJ%7Cpc%7CC2%7Cpc%7CS7%7Cpc%7CC7%7Cpg%7C%7Cpc%7CC9%7Cpc%7CC4%7Cpc%7CH5%7Cpc%7CS4%7Cpg%7C%7Cpc%7CS6%7Cmc%7C9%7Cpg%7C%7C&quot;&gt;here&lt;/a&gt; to follow that link.&lt;/p&gt;
+
+&lt;h3 id=&quot;json&quot;&gt;JSON&lt;/h3&gt;
+&lt;p&gt;As we have seen, both PBNs and LINs require significant effort for programs to parse. I wanted the ability to export Bridgebots data in a format that would be easily consumable by other programs. To that end, Bridgebots includes &lt;a href=&quot;https://marshmallow.readthedocs.io/en/stable/&quot;&gt;Marshmallow&lt;/a&gt; schemas for serializing/deserializing its data to/from JSON. These may not be perfect for other programmers bridge needs, but my hope is they will be useful for consuming translated PBN and LIN records. Check out this example:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;json&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;pathlib&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Path&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;bridgebots&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DealRecordSchema&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;parse_single_lin&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;results&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;parse_single_lin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;path/to/sample.lin&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;deal_record_schema&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DealRecordSchema&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;many&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;deal_record_json&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deal_record_schema&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dump&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;results&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dumps&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deal_record_json&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;indent&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;go&quot;&gt;[
+    {
+        &quot;deal&quot;: {
+            &quot;dealer&quot;: &quot;W&quot;,
+            &quot;ns_vulnerable&quot;: true,
+            &quot;ew_vulnerable&quot;: false,
+            &quot;hands&quot;: {
+                &quot;S&quot;: [
+                    &quot;S9&quot;,
+                    &quot;HJ&quot;,
+                    &quot;H8&quot;,
+                    &quot;H7&quot;,
+                    &quot;H2&quot;,
+                    &quot;DQ&quot;,
+                    &quot;DT&quot;,
+                    &quot;D6&quot;,
+                    &quot;D4&quot;,
+                    &quot;CQ&quot;,
+                    &quot;CJ&quot;,
+                    &quot;C4&quot;,
+                    &quot;C3&quot;
+                ],
+                &quot;W&quot;: [
+                    &quot;SA&quot;,
+                    &quot;SK&quot;,
+                    &quot;S2&quot;,
+                    &quot;HA&quot;,
+                    &quot;H9&quot;,
+                    &quot;H5&quot;,
+                    &quot;DA&quot;,
+                    &quot;DJ&quot;,
+                    &quot;D8&quot;,
+                    &quot;D7&quot;,
+                    &quot;D5&quot;,
+                    &quot;C9&quot;,
+                    &quot;C2&quot;
+                ],
+                &quot;N&quot;: [
+                    &quot;SQ&quot;,
+                    &quot;S7&quot;,
+                    &quot;S6&quot;,
+                    &quot;S5&quot;,
+                    &quot;HK&quot;,
+                    &quot;HQ&quot;,
+                    &quot;H6&quot;,
+                    &quot;H4&quot;,
+                    &quot;D3&quot;,
+                    &quot;D2&quot;,
+                    &quot;CA&quot;,
+                    &quot;CK&quot;,
+                    &quot;C6&quot;
+                ],
+                &quot;E&quot;: [
+                    &quot;SJ&quot;,
+                    &quot;ST&quot;,
+                    &quot;S8&quot;,
+                    &quot;S4&quot;,
+                    &quot;S3&quot;,
+                    &quot;HT&quot;,
+                    &quot;H3&quot;,
+                    &quot;DK&quot;,
+                    &quot;D9&quot;,
+                    &quot;CT&quot;,
+                    &quot;C8&quot;,
+                    &quot;C7&quot;,
+                    &quot;C5&quot;
+                ]
+            }
+        },
+        &quot;board_records&quot;: [
+            {
+                &quot;bidding_record&quot;: [
+                    &quot;1NT&quot;,
+                    &quot;PASS&quot;,
+                    &quot;2H&quot;,
+                    &quot;PASS&quot;,
+                    &quot;2S&quot;,
+                    &quot;PASS&quot;,
+                    &quot;PASS&quot;,
+                    &quot;PASS&quot;
+                ],
+                &quot;raw_bidding_record&quot;: [
+                    &quot;1N&quot;,
+                    &quot;p&quot;,
+                    &quot;2H&quot;,
+                    &quot;p&quot;,
+                    &quot;2S&quot;,
+                    &quot;p&quot;,
+                    &quot;p&quot;,
+                    &quot;p&quot;
+                ],
+                &quot;play_record&quot;: [
+                    &quot;CA&quot;,
+                    &quot;C5&quot;,
+                    &quot;C4&quot;,
+                    &quot;C2&quot;,
+                    &quot;CK&quot;,
+                    &quot;C7&quot;,
+                    &quot;C3&quot;,
+                    &quot;C9&quot;,
+                    &quot;C6&quot;,
+                    &quot;CT&quot;,
+                    &quot;CJ&quot;,
+                    &quot;S2&quot;,
+                    &quot;SA&quot;,
+                    &quot;S5&quot;,
+                    &quot;S3&quot;,
+                    &quot;S9&quot;,
+                    &quot;SK&quot;,
+                    &quot;S6&quot;,
+                    &quot;S4&quot;,
+                    &quot;D4&quot;,
+                    &quot;D5&quot;,
+                    &quot;D3&quot;,
+                    &quot;DK&quot;,
+                    &quot;D6&quot;,
+                    &quot;D9&quot;,
+                    &quot;DQ&quot;,
+                    &quot;DA&quot;,
+                    &quot;D2&quot;,
+                    &quot;DJ&quot;,
+                    &quot;S7&quot;,
+                    &quot;S8&quot;,
+                    &quot;DT&quot;,
+                    &quot;H3&quot;,
+                    &quot;H2&quot;,
+                    &quot;HA&quot;,
+                    &quot;H4&quot;,
+                    &quot;D8&quot;,
+                    &quot;SQ&quot;,
+                    &quot;HT&quot;,
+                    &quot;H7&quot;,
+                    &quot;HK&quot;,
+                    &quot;ST&quot;,
+                    &quot;H8&quot;,
+                    &quot;H5&quot;,
+                    &quot;SJ&quot;,
+                    &quot;HJ&quot;,
+                    &quot;H9&quot;,
+                    &quot;H6&quot;,
+                    &quot;C8&quot;,
+                    &quot;CQ&quot;,
+                    &quot;D7&quot;,
+                    &quot;HQ&quot;
+                ],
+                &quot;declarer&quot;: &quot;W&quot;,
+                &quot;contract&quot;: &quot;2S&quot;,
+                &quot;tricks&quot;: 9,
+                &quot;score&quot;: 140,
+                &quot;scoring&quot;: null,
+                &quot;names&quot;: {
+                    &quot;S&quot;: &quot;SBlumlein&quot;,
+                    &quot;W&quot;: &quot;Forrest_&quot;,
+                    &quot;N&quot;: &quot;grychn48&quot;,
+                    &quot;E&quot;: &quot;granola357&quot;
+                },
+                &quot;date&quot;: null,
+                &quot;event&quot;: null,
+                &quot;bidding_metadata&quot;: [
+                    {
+                        &quot;bid_index&quot;: 0,
+                        &quot;bid&quot;: &quot;1NT&quot;,
+                        &quot;alerted&quot;: false,
+                        &quot;explanation&quot;: &quot;15-17&quot;
+                    },
+                    {
+                        &quot;bid_index&quot;: 2,
+                        &quot;bid&quot;: &quot;2H&quot;,
+                        &quot;alerted&quot;: false,
+                        &quot;explanation&quot;: &quot;spades &quot;
+                    }
+                ],
+                &quot;commentary&quot;: null
+            }
+        ]
+    }
+]
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;n&quot;&gt;reloaded_deal_record&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deal_record_schema&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deal_record_json&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;results&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;reloaded_deal_record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;go&quot;&gt;(results == reloaded_deal_record)=True
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;looking-ahead&quot;&gt;Looking ahead&lt;/h3&gt;
+&lt;p&gt;It has been great walking you through Bridgebots - thank you so much for reading if you made it this far. I put many hours of effort into its current capabilities, and I am proud of that work, but I hope that this is just the beginning. Here are some possible projects for the future:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Ability to create PBNs and to read/write PBNv2 files&lt;/li&gt;
+  &lt;li&gt;Integration with &lt;a href=&quot;https://github.com/anntzer/redeal&quot;&gt;redeal&lt;/a&gt;, another awesome open-source python bridge library. This would provide simulations and access to &lt;a href=&quot;https://github.com/dds-bridge/dds&quot;&gt;DDS&lt;/a&gt;, a powerful open-source double-dummy solver.&lt;/li&gt;
+  &lt;li&gt;Data exploration with python tools like &lt;a href=&quot;https://github.com/pandas-dev/pandas&quot;&gt;pandas&lt;/a&gt; and &lt;a href=&quot;https://github.com/matplotlib/matplotlib&quot;&gt;matplotlib&lt;/a&gt;. I did a little exploration of some bridge data &lt;a href=&quot;https://github.com/forrestrice/bridge-bots/blob/master/plot/bridge_analysis.ipynb&quot;&gt;here&lt;/a&gt;.&lt;/li&gt;
+  &lt;li&gt;Creating ML models to analyze and predict bidding and play. I hope to make this the subject of my next post!&lt;/li&gt;
+  &lt;li&gt;A web-viewer for Bridgebots data&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;If you have ideas for potential applications of or improvements to Bridgebots, feel free to reach out or submit a pull request.&lt;/p&gt;
+
+&lt;p&gt;Hope to see you at the bridge table!&lt;/p&gt;
+
+&lt;p&gt;-Forrest&lt;/p&gt;</content><author><name></name></author><category term="bridge" /><category term="bridgebots" /><summary type="html">In my last post I covered how Bridgebots records the auction and the play of the hand, and how it can be used to import and analyze results from PBN files. Today we will expand that functionality to LIN and JSON files, and your long-winded introduction to Bridgebots will be complete!</summary></entry><entry><title type="html">Introducing Bridgebots Part 2: Deal Records and PBNs</title><link href="https://forrestrice.com/posts/Introducing-Bridgebots-Part-2/" rel="alternate" type="text/html" title="Introducing Bridgebots Part 2: Deal Records and PBNs" /><published>2021-09-18T12:45:09-07:00</published><updated>2021-11-28T17:26:44-08:00</updated><id>https://forrestrice.com/posts/Introducing-Bridgebots-Part-2</id><content type="html" xml:base="https://forrestrice.com/posts/Introducing-Bridgebots-Part-2/">&lt;p&gt;Last week I &lt;a href=&quot;/posts/Introducting-Bridgebots-Part-1&quot;&gt;introduced&lt;/a&gt; a new bridge programming library: &lt;a href=&quot;https://github.com/forrestrice/bridge-bots&quot;&gt;Bridgebots&lt;/a&gt;. I covered how to create and interact with Cards, Suits, and Deals. Today we’ll look at how Bridgebots represents the auction, the play of the hand, the score, and other event metadata. Once we have all the building blocks for representing bridge matches, I’ll show you how Bridgebots can consume one of the most popular bridge data formats: PBN files.&lt;/p&gt;
+
+&lt;h3 id=&quot;setting-the-table&quot;&gt;Setting the Table&lt;/h3&gt;
+&lt;p&gt;There are many pieces of data that could be tracked while playing bridge, but a few are non-negotiable. Those are:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;Players&lt;/li&gt;
+  &lt;li&gt;Auction&lt;/li&gt;
+  &lt;li&gt;Declarer&lt;/li&gt;
+  &lt;li&gt;Contract&lt;/li&gt;
+  &lt;li&gt;Card play&lt;/li&gt;
+  &lt;li&gt;Number of tricks taken&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Depending on the use case for the data, other important fields might include:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;Alerts and explanations of bids&lt;/li&gt;
+  &lt;li&gt;The scoring format&lt;/li&gt;
+  &lt;li&gt;The event name and date&lt;/li&gt;
+  &lt;li&gt;Player convention cards&lt;/li&gt;
+  &lt;li&gt;Commentary from observers&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Bridgebots currently supports most of these fields using the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;DealRecord&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;BoardRecord&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Contract&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Commentary&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;BidMetadata&lt;/code&gt; classes.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;BidMetadata&lt;/code&gt; captures alerts and explanations and has a reference to which bid the metadata applies to.&lt;/p&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;bridgebots&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;BidMetadata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;BiddingSuit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;BoardRecord&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Card&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Commentary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Contract&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;DealRecord&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;from_pbn_deal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;bidding_metadata&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BidMetadata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;bid_index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+    &lt;span class=&quot;n&quot;&gt;bid&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;2NT&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+    &lt;span class=&quot;n&quot;&gt;alerted&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+    &lt;span class=&quot;n&quot;&gt;explanation&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Unusual No Trump: 2 5card minors&quot;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Commentary&lt;/code&gt; is similar in that it can reference a specific bid or card played.&lt;/p&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;n&quot;&gt;comment&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Commentary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bid_index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;play_index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;comment&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Amazing!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Contract&lt;/code&gt; includes the suit, the level, and a count of the number of times the contract was doubled.&lt;/p&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;n&quot;&gt;contract&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Contract&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BiddingSuit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DIAMONDS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# 6DX
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;All of these are inputs into &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;BoardRecord&lt;/code&gt; - the record of the play of a deal at a single table.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;n&quot;&gt;play_record_strings&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&quot;H4&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;H2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;HJ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;HA&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&quot;DA&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;D4&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;D3&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;S3&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&quot;DJ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;D8&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;D6&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;S4&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&quot;DT&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;D9&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;D7&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;S6&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&quot;D2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;C3&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;DK&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;SJ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&quot;DQ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;C4&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;D5&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;S7&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&quot;S2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;H3&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;SK&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;SA&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&quot;HT&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;HQ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;HK&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;C2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&quot;H5&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;S5&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;H9&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;H8&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&quot;C5&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;CT&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;CA&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;C6&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&quot;H7&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;C7&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;ST&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;S8&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&quot;H6&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;C9&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;C8&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;S9&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&quot;CQ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;CJ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;CK&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;SQ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;board_record&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BoardRecord&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;bidding_record&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;PASS&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;1H&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;2NT&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;PASS&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;3NT&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;PASS&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;PASS&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;PASS&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;raw_bidding_record&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;p&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;1H&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;2N&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;p&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;3N&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;p&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;p&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;p&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;play_record&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Card&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;from_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;play_record_strings&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;declarer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NORTH&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;declarer_vulnerable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;contract&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Contract&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BiddingSuit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NO_TRUMP&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;tricks&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;scoring&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;names&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NORTH&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;smalark&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SOUTH&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;PrinceBen&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;EAST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;granola357&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;WEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Forrest_&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;2020-03-13&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;QuickTricks Club Game&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;bidding_metadata&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;BidMetadata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bid_index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bid&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;2NT&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;alerted&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;explanation&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Unusual No Trump: 2 5card minors&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;commentary&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Finally a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;DealRecord&lt;/code&gt; is simply a combination of a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Deal&lt;/code&gt; and a list of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;BoardRecords&lt;/code&gt; corresponding to all the times the deal was played.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;c1&quot;&gt;# Peeking ahead at how PBN data can be consumed
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deal&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deal_utils&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;from_pbn_deal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;N&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;None&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;W:98.KT5.J75.KJT84 K753.Q94.AT84.62 QJ6.AJ8762.62.73 AT42.3.KQ93.AQ95&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;deal_record&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DealRecord&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;board_record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deal_record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;go&quot;&gt;DealRecord(deal=Deal(
+	dealer=Direction.NORTH, ns_vulnerable=False, ew_vulnerable=False
+	North: PlayerHand(SK S7 S5 S3 | HQ H9 H4 | DA DT D8 D4 | C6 C2)
+	South: PlayerHand(SA ST S4 S2 | H3 | DK DQ D9 D3 | CA CQ C9 C5)
+	East: PlayerHand(SQ SJ S6 | HA HJ H8 H7 H6 H2 | D6 D2 | C7 C3)
+	West: PlayerHand(S9 S8 | HK HT H5 | DJ D7 D5 | CK CJ CT C8 C4)
+), board_records=[BoardRecord(bidding_record=['PASS', '1H', '2NT', 'PASS', '3NT', 'PASS', 'PASS', 'PASS'], raw_bidding_record=['p', '1H', '2N', 'p', '3N', 'p', 'p', 'p'], play_record=[H4, H2, HJ, HA, DA, D4, D3, S3, DJ, D8, D6, S4, DT, D9, D7, S6, D2, C3, DK, SJ, DQ, C4, D5, S7, S2, H3, SK, SA, HT, HQ, HK, C2, H5, S5, H9, H8, C5, CT, CA, C6, H7, C7, ST, S8, H6, C9, C8, S9, CQ, CJ, CK, SQ], declarer=NORTH, contract=Contract(level=3, suit=NO_TRUMP, doubled=0), tricks=6, scoring=None, names={NORTH: 'smalark', SOUTH: 'PrinceBen', EAST: 'granola357', WEST: 'Forrest_'}, date='2020-03-13', event='QuickTricks Club Game', bidding_metadata=[BidMetadata(bid_index=2, bid='2NT', alerted=False, explanation='Unusual No Trump: 2 5card minors')], commentary=None, score=-300)])
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;All of these classes are implemented as frozen &lt;a href=&quot;https://docs.python.org/3/library/dataclasses.html&quot;&gt;Python Dataclasses&lt;/a&gt; and should be treated as immuatable.&lt;/p&gt;
+
+&lt;h3 id=&quot;portable-bridge-notation&quot;&gt;Portable Bridge Notation&lt;/h3&gt;
+&lt;p&gt;Portable Bridge Notation (PBN) is one of the most common bridge data formats. It contains all the information we discussed above that is needed for record-keeping, as well as some additional fields which Bridgebots does not yet support. It is designed to be human-readable, which is great for players, but this design decision means PBN is somewhat difficult for a bridge program to use. If you want to know all the details, you can read the full &lt;a href=&quot;https://www.tistis.nl/pbn/&quot;&gt;PBN standard&lt;/a&gt;. Here’s an example:&lt;/p&gt;
+
+&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;[Event &quot;Cavendish Pairs Day 2&quot;]
+[Site &quot;Rio Hotel, Las Vegas, USA&quot;]
+[Date &quot;2004.05.05&quot;]
+[Board &quot;10&quot;]
+[West &quot;&quot;]
+[North &quot;&quot;]
+[East &quot;&quot;]
+[South &quot;&quot;]
+[Dealer &quot;E&quot;]
+[Vulnerable &quot;All&quot;]
+[Deal &quot;W:63.K3.K9532.J963 T82.62.T764.KQ42 KQJ7.QJ754.AJ.AT A954.AT98.Q8.875&quot;]
+[Scoring &quot;IMP;Cross&quot;]
+[Declarer &quot;W&quot;]
+[Contract &quot;3NT&quot;]
+[Result &quot;9&quot;]
+[Auction &quot;E&quot;]
+1H Pass 1S =1= Pass
+2C ! Pass 2H =2= Pass
+2S =3= Pass 3NT AP
+[Note &quot;1:0-4 !ss&quot;]
+[Note &quot;2:less than 8 points&quot;]
+[Note &quot;3:17+ with 4 !S&quot;]
+[Play &quot;N&quot;]
+CQ CA C8 C3
+H6 H4 HT HK
+H2 HQ HA H3
+CK CT C5 C6
+D4 DJ DQ DK
+C2 S7 C7 CJ
+C4 H5 S4 C9
+-  -  -  S6
+*
+[Stage &quot;Round 4&quot;]
+[HomeTeam &quot;Team 1&quot;]
+[VisitTeam &quot;Team 2&quot;]
+[ScoreIMP &quot;NS -241&quot;]
+
+
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Most of these fields are straightforward, but a few require some effort to consume programmatically. The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Auction&lt;/code&gt; section places four bids on each text line, but alerts and explanations are interspersed. To understand what a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Note&lt;/code&gt; node is referring to, the user needs to match the note number to the bid proceeding the explanation number from the auction.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Play&lt;/code&gt; section keeps each player’s play in the same text column. This is great for scanning the play as a human, but a program needs to be able to understand which player won the previous trick in order to determine the order the cards must have been played in the current trick.&lt;/p&gt;
+
+&lt;h3 id=&quot;python-bridge-nuptials&quot;&gt;Python Bridge Nuptials&lt;/h3&gt;
+&lt;p&gt;PBNs was the data format I most wanted access to for my bridge data projects, so the original use case for Bridgebots was parsing PBNs. The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pbn&lt;/code&gt; module provides this.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;pathlib&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Path&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;typing&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;List&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;bridgebots&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DealRecord&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;parse_pbn&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;pbn_path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;path/to/above/example.pbn&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;results&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;List&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DealRecord&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;parse_pbn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pbn_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;results&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;go&quot;&gt;[DealRecord(deal=Deal(
+	dealer=Direction.EAST, ns_vulnerable=True, ew_vulnerable=True
+	North: PlayerHand(ST S8 S2 | H6 H2 | DT D7 D6 D4 | CK CQ C4 C2)
+	South: PlayerHand(SA S9 S5 S4 | HA HT H9 H8 | DQ D8 | C8 C7 C5)
+	East: PlayerHand(SK SQ SJ S7 | HQ HJ H7 H5 H4 | DA DJ | CA CT)
+	West: PlayerHand(S6 S3 | HK H3 | DK D9 D5 D3 D2 | CJ C9 C6 C3)
+&lt;/span&gt;&lt;span class=&quot;gp&quot;&gt;), board_records=[BoardRecord(bidding_record=['1H', 'PASS', '1S', 'PASS', '2C', 'PASS', '2H', 'PASS', '2S', 'PASS', '3NT', 'PASS', 'PASS', 'PASS'], raw_bidding_record=['1H', 'Pass', '1S', '=1=', 'Pass', '2C', '!', 'Pass', '2H', '=2=', 'Pass', '2S', '=3=', 'Pass', '3NT', 'AP'], play_record=[CQ, CA, C8, C3, H4, HT, HK, H6, H3, H2, HQ, HA, C5, C6, CK, CT, D4, DJ, DQ, DK, CJ, C2, S7, C7, C9, C4, H5, S4, S6], declarer=WEST, contract=Contract(level=3, suit=NO_TRUMP, doubled=0), tricks=9, scoring='IMP;&lt;/span&gt;Cross&lt;span class=&quot;s1&quot;&gt;', names={NORTH: '', SOUTH: '', EAST: '', WEST: ''}, date='&lt;/span&gt;2004.05.05&lt;span class=&quot;s1&quot;&gt;', event='&lt;/span&gt;Cavendish Pairs Day 2&lt;span class=&quot;s1&quot;&gt;', bidding_metadata=[BidMetadata(bid_index=2, bid='&lt;/span&gt;1S&lt;span class=&quot;s1&quot;&gt;', alerted=False, explanation='&lt;/span&gt;0-4 &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;ss&lt;span class=&quot;s1&quot;&gt;'), BidMetadata(bid_index=4, bid='&lt;/span&gt;2C&lt;span class=&quot;s1&quot;&gt;', alerted=True, explanation=None), BidMetadata(bid_index=6, bid='&lt;/span&gt;2H&lt;span class=&quot;s1&quot;&gt;', alerted=False, explanation='&lt;/span&gt;less than 8 points&lt;span class=&quot;s1&quot;&gt;'), BidMetadata(bid_index=8, bid='&lt;/span&gt;2S&lt;span class=&quot;s1&quot;&gt;', alerted=False, explanation='&lt;/span&gt;17+ with 4 &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;S&lt;span class=&quot;s1&quot;&gt;')], commentary=None, score=600)])]
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h3 id=&quot;bridgebots-activate&quot;&gt;Bridgebots Activate!&lt;/h3&gt;
+&lt;p&gt;Last week I promised that I would show you Bridgebots in action with real bridge data. There is an amazing repository of PBN records at &lt;a href=&quot;http://bridgetoernooi.com&quot;&gt;Bridge Toernooi&lt;/a&gt; (Dutch for Tournament) covering many years of the Bermuda Bowl, Cavendish, Spingold, Vanderbilt and National matches. Let’s start with the 2017 Bermuda Bowl which can be &lt;a href=&quot;http://bridgetoernooi.com/index.php/home/download&quot;&gt;downloaded&lt;/a&gt; as a single zipped PBN file.&lt;/p&gt;
+
+&lt;p&gt;First we load and process the pbn file.&lt;/p&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;collections&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;defaultdict&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;pathlib&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Path&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;bridgebots&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DealRecord&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;parse_pbn&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;pbn_path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/path/to/bermuda_bowl_2017.pbn&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;results&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;parse_pbn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pbn_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Now we can use Bridgebots to write simple programs to find data we’re interested in. In 2017 USA2 consisting of Martin Fleisher, Joe Grue, Chip Martel, Brad Moss, Jacek Pszczoła, Michael Rosenberg, and Jan Martel (npc) won the main event. Michael Rosenberg is famous for his declarer play, so let’s collect all the boards where he declared.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;n&quot;&gt;rosenberg_deals&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deal_record&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;results&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;board_record&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deal_record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;board_records&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;board_record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;names&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;board_record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;declarer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Mic Rosenb&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;rosenberg_deals&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DealRecord&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deal_record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;board_record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rosenberg_deals&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;go&quot;&gt;47
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Now let’s see how often he made his contract.&lt;/p&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deal_record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;board_records&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;score&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deal_record&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rosenberg_deals&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;go&quot;&gt;31
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Not bad!&lt;/p&gt;
+
+&lt;p&gt;Say I’m interested in going over every slam in the tournament.&lt;/p&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;n&quot;&gt;slam_deal_dict&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;defaultdict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deal_record&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;results&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;board_record&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deal_record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;board_records&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;board_record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;contract&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;level&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;slam_deal_dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deal_record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;board_record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;slam_deal_records&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DealRecord&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;board_records&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;board_records&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slam_deal_dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;items&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()]&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;deals with slams:&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;slam_deal_records&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;boards with slams:&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;board_records&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dr&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slam_deal_records&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;go&quot;&gt;deals with slams: 42
+boards with slams: 113
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;a href=&quot;https://youtu.be/mMqMCMcwO8o?t=15&quot;&gt;Slammin!&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;That’s all for today. Stay tuned for Part III where we will dive into the wonders of more bridge data formats: LIN (used by BBO) and JSON.&lt;/p&gt;</content><author><name></name></author><category term="bridge" /><category term="bridgebots" /><summary type="html">Last week I introduced a new bridge programming library: Bridgebots. I covered how to create and interact with Cards, Suits, and Deals. Today we’ll look at how Bridgebots represents the auction, the play of the hand, the score, and other event metadata. Once we have all the building blocks for representing bridge matches, I’ll show you how Bridgebots can consume one of the most popular bridge data formats: PBN files.</summary></entry><entry><title type="html">Introducing Bridgebots Part 1: Suits, Cards, Hands, and Deals</title><link href="https://forrestrice.com/posts/Introducting-Bridgebots-Part-1/" rel="alternate" type="text/html" title="Introducing Bridgebots Part 1: Suits, Cards, Hands, and Deals" /><published>2021-09-11T12:45:09-07:00</published><updated>2021-09-11T12:45:09-07:00</updated><id>https://forrestrice.com/posts/Introducting-Bridgebots-Part-1</id><content type="html" xml:base="https://forrestrice.com/posts/Introducting-Bridgebots-Part-1/">&lt;p&gt;Over the past year I have been pursuing a few different bridge programming projects. Eventually I would like to explore the possibility of building ML models which can play and bid competitively, understand a variety of opposing systems, and explain to humans or other bots their own actions and system. To that end I began to collect training data consisting of the bidding and play of high-level players. I quickly encountered two main problems:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Bridge data formats such as PBN and LIN are difficult to parse or interact with programmatically.&lt;/li&gt;
+  &lt;li&gt;Many of the tools built to consume or produce bridge data are closed source and/or only available on Windows.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Today I am pleased to announce the first release of my solution to both these problems: &lt;a href=&quot;https://github.com/forrestrice/bridge-bots&quot;&gt;Bridgebots&lt;/a&gt;!&lt;/p&gt;
+
+&lt;h3 id=&quot;what-is-bridgebots&quot;&gt;What is Bridgebots?&lt;/h3&gt;
+&lt;p&gt;I’m so glad you asked. Bridgebots is a &lt;a href=&quot;https://en.wikipedia.org/wiki/MIT_License&quot;&gt;MIT Licensed&lt;/a&gt; collection of libraries and scripts built to aid in the processing of bridge data. It is implemented in python in order to be portable and approachable by a wide range of programmers. Today I will be going over the functionality of &lt;a href=&quot;https://github.com/forrestrice/bridge-bots/tree/master/bridgebots&quot;&gt;Bridgebots Core&lt;/a&gt;, the primary library for parsing and representing bridge data.&lt;/p&gt;
+
+&lt;h3 id=&quot;getting-started&quot;&gt;Getting Started&lt;/h3&gt;
+&lt;p&gt;As of this writing bridgebots core is on version 0.0.7 and is available on &lt;a href=&quot;https://pypi.org/project/bridgebots/&quot;&gt;pypi&lt;/a&gt;. It requires python 3.8 or later. Begin with a simple:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;pip &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;bridgebots
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;building-blocks&quot;&gt;Building Blocks&lt;/h3&gt;
+&lt;p&gt;In order to process bridge data we need representations for the myriad components that make up the game. Starting with the simplest we have:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Cardinal Direction&lt;/li&gt;
+  &lt;li&gt;Card (composed of a Suit and a Rank)&lt;/li&gt;
+  &lt;li&gt;Bidding Suit (Suits with the addition of No Trump)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Bridgebots uses &lt;a href=&quot;https://docs.python.org/3/library/enum.html&quot;&gt;Enums&lt;/a&gt; to represent these.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;bridgebots&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BiddingSuit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Rank&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Suit&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;dealer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;EAST&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;boss_suit&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Suit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SPADES&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;opener_suit&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BiddingSuit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HEARTS&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;contract_suit&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BiddingSuit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NO_TRUMP&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;highest_rank&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Rank&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ACE&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;lowest_rank&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Rank&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TWO&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Each comes with helper methods for creation, comparison, or general utility.&lt;/p&gt;
+&lt;h4 id=&quot;creation&quot;&gt;Creation&lt;/h4&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;from_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'N'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Suit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;from_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'C'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BiddingSuit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;from_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'H'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Rank&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;from_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'K'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;go&quot;&gt;Direction.from_str('N')=NORTH
+Suit.from_str('C')=CLUBS
+BiddingSuit.from_str('H')=HEARTS
+Rank.from_str('K')=KING
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h4 id=&quot;comparison&quot;&gt;Comparison&lt;/h4&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;(Suit.HEARTS &amp;gt; boss_suit): &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Suit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HEARTS&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;boss_suit&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;(opener_suit &amp;gt; contract_suit): &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;opener_suit&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;contract_suit&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;(highest_rank &amp;gt; lowest_rank): &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;highest_rank&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lowest_rank&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;gp&quot;&gt;(Suit.HEARTS &amp;gt;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;boss_suit&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;: False
+&lt;span class=&quot;gp&quot;&gt;(opener_suit &amp;gt;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;contract_suit&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;: False
+&lt;span class=&quot;gp&quot;&gt;(highest_rank &amp;gt;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;lowest_rank&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;: True
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;utility&quot;&gt;Utility&lt;/h4&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dealer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;next&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dealer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;partner&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dealer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;previous&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dealer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;abbreviation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;boss_suit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;abbreviation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Rank&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TEN&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;abbreviation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;go&quot;&gt;dealer.next()=SOUTH dealer.partner()=WEST dealer.previous()=NORTH
+dealer.abbreviation()='E', boss_suit.abbreviation()='S', Rank.TEN.abbreviation()='T'
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;cards-hands-and-deals-oh-my&quot;&gt;Cards, Hands, and Deals, Oh My!&lt;/h3&gt;
+&lt;p&gt;In order to record the bidding and play of a bridge hand we need to combine our building blocks into more complex concepts. Bridgebots represents cards, hands, and deals using &lt;a href=&quot;https://docs.python.org/3/tutorial/classes.html&quot;&gt;Python Classes&lt;/a&gt;. Just like the enums, these classes provide helper methods for a variety of use cases. For this example we’ll use a hand from a recent club game:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/bridge/bridgebots/announce_board_1.png&quot; alt=&quot;board 1&quot; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;let-me-give-you-a-hand&quot;&gt;Let Me Give You a Hand&lt;/h4&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;bridgebots&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Card&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Deal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PlayerHand&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Rank&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Suit&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;club_nine&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Card&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;from_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;C9&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;diamond_three&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Card&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Suit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DIAMONDS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Rank&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;THREE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;south_hand&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PlayerHand&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;from_string_lists&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;spades&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;K&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;3&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;hearts&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;K&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;7&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;diamonds&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;A&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;T&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;4&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;clubs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;K&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;8&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;7&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;4&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;north_card_strings&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;SA&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;S5&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;HQ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;HT&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;H9&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;H5&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;H4&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;DJ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;D3&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;D2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;C9&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;C6&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;C2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;north_cards&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Card&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;from_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;card_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;card_str&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;north_card_strings&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;north_hand&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PlayerHand&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;from_cards&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;north_cards&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;club_nine&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;diamond_three&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;south_hand&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;(club_nine in north_hand.cards): &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;club_nine&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;north_hand&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cards&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;go&quot;&gt;club_nine=C9, diamond_three=D3
+south_hand=PlayerHand(SK S3 S2 | HK H7 H2 | DA DT D4 | CK C8 C7 C4)
+(club_nine in north_hand.cards): True
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h4 id=&quot;whats-your-deal&quot;&gt;What’s Your Deal?&lt;/h4&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;n&quot;&gt;east_hand&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PlayerHand&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;from_string_lists&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Q97&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;J8&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;K9865&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;JT5&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;west_hand&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PlayerHand&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;from_string_lists&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;JT864&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;A63&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Q7&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;AQ3&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;deal&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Deal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;dealer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NORTH&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ns_vulnerable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ew_vulnerable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;hands&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NORTH&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;north_hand&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;EAST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;east_hand&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SOUTH&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;south_hand&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;WEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;west_hand&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;player_cards&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NORTH&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hands&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SOUTH&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;go&quot;&gt;deal=Deal(
+	dealer=Direction.NORTH, ns_vulnerable=False, ew_vulnerable=False
+	North: PlayerHand(SA S5 | HQ HT H9 H5 H4 | DJ D3 D2 | C9 C6 C2)
+	South: PlayerHand(SK S3 S2 | HK H7 H2 | DA DT D4 | CK C8 C7 C4)
+	East: PlayerHand(SQ S9 S7 | HJ H8 | DK D9 D8 D6 D5 | CJ CT C5)
+	West: PlayerHand(SJ ST S8 S6 S4 | HA H6 H3 | DQ D7 | CA CQ C3)
+)
+deal.player_cards[Direction.NORTH]=[SA, S5, HQ, HT, H9, H5, H4, DJ, D3, D2, C9, C6, C2]
+deal.hands[Direction.SOUTH]=PlayerHand(SK S3 S2 | HK H7 H2 | DA DT D4 | CK C8 C7 C4)
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h3 id=&quot;next-week-on-bridgebots&quot;&gt;Next Week on Bridgebots&lt;/h3&gt;
+&lt;p&gt;This concludes the introduction to Bridgebots, but we’re really just getting started. In my next post I will show you how Bridgebots represents the bidding and play history, and how to use Bridgebots to consume and interact with real bridge data!&lt;/p&gt;</content><author><name></name></author><category term="bridge" /><category term="bridgebots" /><summary type="html">Over the past year I have been pursuing a few different bridge programming projects. Eventually I would like to explore the possibility of building ML models which can play and bid competitively, understand a variety of opposing systems, and explain to humans or other bots their own actions and system. To that end I began to collect training data consisting of the bidding and play of high-level players. I quickly encountered two main problems:</summary></entry><entry><title type="html">Site Revamp</title><link href="https://forrestrice.com/posts/Site-Revamp/" rel="alternate" type="text/html" title="Site Revamp" /><published>2021-09-11T12:40:09-07:00</published><updated>2021-09-11T12:40:09-07:00</updated><id>https://forrestrice.com/posts/Site-Revamp</id><content type="html" xml:base="https://forrestrice.com/posts/Site-Revamp/">&lt;p&gt;Welcome back! It’s been over a year since my last post but bridge and life have continued apace. I spent the last couple days upgrading the site to use the &lt;a href=&quot;https://github.com/cotes2020/jekyll-theme-chirpy&quot;&gt;chirpy theme&lt;/a&gt; which has nice tagging and categories support. I have some exciting bridge programming developments to announce in my next post!&lt;/p&gt;</content><author><name></name></author><category term="misc" /><summary type="html">Welcome back! It’s been over a year since my last post but bridge and life have continued apace. I spent the last couple days upgrading the site to use the chirpy theme which has nice tagging and categories support. I have some exciting bridge programming developments to announce in my next post!</summary></entry><entry><title type="html">Quicktricks Game 14</title><link href="https://forrestrice.com/posts/Quicktricks-Game-14/" rel="alternate" type="text/html" title="Quicktricks Game 14" /><published>2020-09-07T12:45:09-07:00</published><updated>2020-09-07T12:45:09-07:00</updated><id>https://forrestrice.com/posts/Quicktricks-Game-14</id><content type="html" xml:base="https://forrestrice.com/posts/Quicktricks-Game-14/">&lt;p&gt;Really nice game (and double masterpoints!) 2nd/24 59.47%&lt;/p&gt;
+
+&lt;iframe width=&quot;640&quot; height=&quot;360&quot; src=&quot;https://www.youtube.com/embed/iBCbvMVS6SI&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer;
+    autoplay;
+    encrypted-media;
+    gyroscope;
+    picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;</content><author><name></name></author><category term="bridge" /><category term="quicktricks" /><summary type="html">Really nice game (and double masterpoints!) 2nd/24 59.47%</summary></entry><entry><title type="html">Quicktricks Game 13</title><link href="https://forrestrice.com/posts/Quicktricks-Game-13/" rel="alternate" type="text/html" title="Quicktricks Game 13" /><published>2020-08-31T12:45:09-07:00</published><updated>2020-08-31T12:45:09-07:00</updated><id>https://forrestrice.com/posts/Quicktricks-Game-13</id><content type="html" xml:base="https://forrestrice.com/posts/Quicktricks-Game-13/">&lt;p&gt;Poor game - 25th/28 with 40.22%&lt;/p&gt;
+
+&lt;iframe width=&quot;640&quot; height=&quot;360&quot; src=&quot;https://www.youtube.com/embed/v0870HYIQLg&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer;
+    autoplay;
+    encrypted-media;
+    gyroscope;
+    picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;</content><author><name></name></author><category term="bridge" /><category term="quicktricks" /><summary type="html">Poor game - 25th/28 with 40.22%</summary></entry><entry><title type="html">Quicktricks Game 10</title><link href="https://forrestrice.com/posts/Quicktricks-Game-10/" rel="alternate" type="text/html" title="Quicktricks Game 10" /><published>2020-08-10T12:45:09-07:00</published><updated>2020-08-10T12:45:09-07:00</updated><id>https://forrestrice.com/posts/Quicktricks-Game-10</id><content type="html" xml:base="https://forrestrice.com/posts/Quicktricks-Game-10/">&lt;p&gt;7th/24 53.41%&lt;/p&gt;
+
+&lt;iframe width=&quot;640&quot; height=&quot;360&quot; src=&quot;https://www.youtube.com/embed/JZxhZC82tfY&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer;
+    autoplay;
+    encrypted-media;
+    gyroscope;
+    picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;</content><author><name></name></author><category term="bridge" /><category term="quicktricks" /><summary type="html">7th/24 53.41%</summary></entry><entry><title type="html">QT 8 Post-Mortem</title><link href="https://forrestrice.com/posts/QT-8-Post-Mortem/" rel="alternate" type="text/html" title="QT 8 Post-Mortem" /><published>2020-07-28T12:45:09-07:00</published><updated>2020-09-09T22:43:53-07:00</updated><id>https://forrestrice.com/posts/QT-8-Post-Mortem</id><content type="html" xml:base="https://forrestrice.com/posts/QT-8-Post-Mortem/">&lt;p&gt;Unfortunately the VOD didn’t survive.&lt;/p&gt;
+
+&lt;details&gt;
+  &lt;summary&gt;Hand 1
+  &lt;/summary&gt;
+
+  &lt;iframe src=&quot;https://www.bridgebase.com/tools/handviewer.html?bbo=y&amp;amp;lin=pn|Forrest_,joycebprop,granola357,AndrewH17|st%7C%7Cmd%7C4ST5HQ87643DJC5432%2CSQ87HAK9DQCKQJT97%2CSKJ63HDAT98732CA8%2C%7Crh%7C%7Cah%7CBoard%202%7Csv%7Cn%7Cmb%7Cp%7Cmb%7Cp%7Cmb%7C1C%7Cmb%7C1D%7Cmb%7C1H%7Cmb%7Cp%7Cmb%7C2C%7Cmb%7C2D%7Cmb%7Cp%7Cmb%7Cp%7Cmb%7C3C%7Cmb%7Cp%7Cmb%7Cp%7Cmb%7Cp%7Cpc%7CDA%7Cpc%7CD4%7Cpc%7CDJ%7Cpc%7CDQ%7Cpc%7CD2%7Cpc%7CDK%7Cpc%7CC2%7Cpc%7CC7%7Cpc%7CSQ%7Cpc%7CSK%7Cpc%7CSA%7Cpc%7CS5%7Cpc%7CC6%7Cpc%7CC3%7Cpc%7CC9%7Cpc%7CCA%7Cpc%7CSJ%7Cpc%7CS2%7Cpc%7CST%7Cpc%7CS7%7Cpc%7CS3%7Cpc%7CS4%7Cpc%7CC4%7Cpc%7CS8%7Cpc%7CH3%7Cpc%7CHA%7Cpc%7CC8%7Cpc%7CH2%7Cpc%7CS6%7Cpc%7CS9%7Cpc%7CC5%7Cpc%7CCT%7Cpc%7CCK%7Cpc%7CD3%7Cpc%7CD5%7Cpc%7CH4%7Cpc%7CCQ%7Cpc%7CD7%7Cpc%7CD6%7Cpc%7CH6%7Cpc%7CHK%7Cpc%7CD8%7Cpc%7CH5%7Cpc%7CH7%7Cpc%7CH9%7Cpc%7CD9%7Cpc%7CHJ%7Cpc%7CHQ%7Cpc%7CH8%7Cpc%7CCJ%7Cpc%7CDT%7Cpc%7CHT%7C&quot; height=&quot;480&quot; width=&quot;720&quot; allowfullscreen=&quot;allowfullscreen&quot;&gt; 
+    &lt;/iframe&gt;
+  &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;forrest07/30/2020
+declarer misplayed this
+not sure what the opening lead should be
+DA seems ok
+normally with long trumps i'd be hesitant to ruff the second diamond
+but it felt like mine were so bad that it wouldn't matter
+but maybe that's just wrong
+and i guess there's some chance declarer had Qx
+hmm i guess not
+if ace was led
+chuhchung07/30/2020
+mark should really continue  a diamond higher than dummy's spot
+forrest07/30/2020
+haha yeah
+chuhchung07/30/2020
+and when dummy puts up a winner,  i ruff
+so don't worry about that
+there's like, one scenario where it's wrong
+otherwise just ruff winners
+forrest07/30/2020
+yeah ok - just don't want to give overruffs on air
+chuhchung07/30/2020
+yes, but this is a winner
+you killed the DK
+that's a trick declarer doesn't get
+it's like covering an honor
+forrest07/30/2020
+right
+i feel like going after spades is a mistake that's pretty easy to make (for me)
+though i wouldn't lead the queen
+so i guess that was the real problem
+but here's where it's real bad to do so
+chuhchung07/30/2020
+it's just a really bad play
+doesn't accomplish anything and exposes you to ruffs
+just draw trumps
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;  &lt;/div&gt;
+&lt;/details&gt;
+
+&lt;details&gt;
+  &lt;summary&gt;Hand 3
+  &lt;/summary&gt;
+
+  &lt;iframe src=&quot;https://www.bridgebase.com/tools/handviewer.html?bbo=y&amp;amp;lin=pn|Forrest_,EricBishop,granola357,MarcLorenz|st%7C%7Cmd%7C1SQJ98HJ7DKJCAKQJ4%2CS4HAK9852DA974C72%2CSAT6HQT4DQ63CT963%2C%7Crh%7C%7Cah%7CBoard%203%7Csv%7Ce%7Cmb%7C1C%7Cmb%7C2H%7Cmb%7Cp%7Cmb%7Cp%7Cmb%7C2S%7Cmb%7Cp%7Cmb%7C3S%7Cmb%7Cp%7Cmb%7C4S%7Cmb%7Cp%7Cmb%7Cp%7Cmb%7Cp%7Cpc%7CHA%7Cpc%7CH4%7Cpc%7CH3%7Cpc%7CH7%7Cpc%7CHK%7Cpc%7CHT%7Cpc%7CH6%7Cpc%7CHJ%7Cpc%7CH2%7Cpc%7CHQ%7Cpc%7CS5%7Cpc%7CS8%7Cpc%7CSQ%7Cpc%7CS4%7Cpc%7CS6%7Cpc%7CS2%7Cpc%7CS9%7Cpc%7CH5%7Cpc%7CSA%7Cpc%7CS3%7Cpc%7CC3%7Cpc%7CC5%7Cpc%7CCA%7Cpc%7CC2%7Cpc%7CCK%7Cpc%7CC7%7Cpc%7CC6%7Cpc%7CC8%7Cpc%7CCQ%7Cpc%7CH8%7Cpc%7CCT%7Cpc%7CS7%7Cpc%7CSK%7Cpc%7CSJ%7Cpc%7CD4%7Cpc%7CST%7Cpc%7CD5%7Cpc%7CDJ%7Cpc%7CDA%7Cpc%7CD3%7Cpc%7CD7%7Cpc%7CD6%7Cpc%7CDT%7Cpc%7CDK%7Cpc%7CCJ%7Cpc%7CH9%7Cpc%7CC9%7Cpc%7CD2%7Cpc%7CC4%7Cpc%7CD9%7Cpc%7CDQ%7Cpc%7CD8%7C&quot; height=&quot;480&quot; width=&quot;720&quot; allowfullscreen=&quot;allowfullscreen&quot;&gt; 
+    &lt;/iframe&gt;
+  &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;forrest07/30/2020
+this raise didn't seem reasonable to me
+i guess if you think i'm 6-5?
+even then it's not an invite
+but maybe it is if i reverse
+so not sure
+but we have a 9 card club fit at least
+chuhchung07/30/2020
+i think you should have more shape, but yes, the raise is really bad
+on the actual hand i would double with yours
+as for the auction, after :2S:, i would just cue with mark's hand
+&quot;strong hand, no clear direction&quot;
+aka what the default meaning of cues should be :stuck_out_tongue:
+forrest07/30/2020
+i guess it's a tiny bit confusing
+since in a vacuum i wouldn't consider his hand worth a cue, but maybe it is opposite and opening and a reopening double
+is it forcing to game or not necessarily?
+chuhchung07/30/2020
+i'm talking about after you bid :2S:, his hand is a maximum
+so he just has to FG
+forrest07/30/2020
+oh ok i thought you meant after i doubled
+chuhchung07/30/2020
+after the double he can bid :3C:, promising values
+:2N: should be leb
+idk if that's standard. but it should be
+it's what coffee and i play
+forrest07/30/2020
+ok same principle as using it over a reverse i suppose
+though does that mean :2N: is also leb over :2S:?
+chuhchung07/30/2020
+yes
+and i would say sam eprinciple as if they opened a weak 2, but that's probably just a semantics thing :stuck_out_tongue:
+forrest07/30/2020
+well they opened a weak 2 and opener reversed
+all on the same hand
+haha
+chuhchung07/30/2020
+yeah
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;  &lt;/div&gt;
+&lt;/details&gt;
+
+&lt;details&gt;
+  &lt;summary&gt;Hand 4
+  &lt;/summary&gt;
+
+  &lt;iframe src=&quot;https://www.bridgebase.com/tools/handviewer.html?bbo=y&amp;amp;lin=pn|Forrest_,EricBishop,granola357,MarcLorenz|st%7C%7Cmd%7C2SQ93HKQTD76CK8652%2CSJ86HJ86DAKQ9842C%2CSAK754HA4D53CAQT7%2C%7Crh%7C%7Cah%7CBoard%204%7Csv%7Cb%7Cmb%7C3D%7Cmb%7Cd%7Cmb%7Cp%7Cmb%7C4C%7Cmb%7Cp%7Cmb%7C4S%7Cmb%7Cp%7Cmb%7Cp%7Cmb%7Cp%7Cpc%7CDT%7Cpc%7CD6%7Cpc%7CDA%7Cpc%7CD3%7Cpc%7CDK%7Cpc%7CD5%7Cpc%7CDJ%7Cpc%7CD7%7Cpc%7CD2%7Cpc%7CH4%7Cpc%7CST%7Cpc%7CSQ%7Cpc%7CS3%7Cpc%7CS6%7Cpc%7CSK%7Cpc%7CS2%7Cpc%7CSA%7Cpc%7CH2%7Cpc%7CS9%7Cpc%7CS8%7Cpc%7CS7%7Cpc%7CH3%7Cpc%7CC2%7Cpc%7CSJ%7Cpc%7CH6%7Cpc%7CHA%7Cpc%7CH5%7Cpc%7CHT%7Cpc%7CCA%7Cpc%7CC3%7Cpc%7CC5%7Cpc%7CD4%7Cpc%7CCQ%7Cpc%7CC4%7Cpc%7CC6%7Cpc%7CD8%7Cpc%7CC7%7Cpc%7CC9%7Cpc%7CCK%7Cpc%7CD9%7Cpc%7CHK%7Cpc%7CH8%7Cpc%7CCT%7Cpc%7CH7%7Cmc%7C10%7C&quot; height=&quot;480&quot; width=&quot;720&quot; allowfullscreen=&quot;allowfullscreen&quot;&gt; 
+    &lt;/iframe&gt;
+  &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;forrest07/30/2020
+This isn't a double unless i switch clubs and hearts for you
+i guess he's just power doubling
+so maybe that's fine
+chuhchung07/30/2020
+doonnn''t't't't't douibleleelelelek
+forrest07/30/2020
+though we're pretty high
+chuhchung07/30/2020
+you will never ever ever EVER know what to do when partner bids :4H:
+at some point you will be so strong that you double and hope if partner bids :4H: it makes on brute force
+but this hand isn't up there
+forrest07/30/2020
+i thought about cueing but figured i was a little too weak
+idk what you think
+chuhchung07/30/2020
+your hand is in a tough spot
+i would just bid :4C:
+cue should be no clear direction - in your case, it does have a clear direction: clubs
+it's sad that we have so many values, but :5C: feels like an overbid, partner may have stretched, minors are sketchy, etc etc
+forrest07/30/2020
+right
+well over a 1 level take out double I thought advancer cued to show forcing/good hand
+not necessarily no clear direction
+chuhchung07/30/2020
+sort of
+but if you have something like AKxxx Axx x Jxxx over partner's takeout double of :1H:, i wouldn't cue
+would just bash :4S:
+clear direction
+but if partner doubles 1D and you have 4-4 majors and a good hand, that's a cue
+i think my principle still holds
+i guess it breaks when you have  a slam try. but basics first
+and these days i just take out all ambiguity by bidding 5M for my slam try.
+that way you'll never have to guess if partner is control bidding for you when we never even fucking agreed a suit explicitly
+it drives me a little nuts
+forrest07/30/2020
+yeah not too many slams after they open anyway
+chuhchung07/30/2020
+yeah
+it'll be more relevant if they preempt
+but like i said, i just bash 5 or 6
+anyway, mark can just bid :3S:
+forrest07/30/2020
+presumably i raise to game
+chuhchung07/30/2020
+yes
+mark forced the high trump
+it's irrelevant, but it's still a scary habit
+generally there's nothing to worry about when they're down to the lone high trump
+you just go along as if they're all gone (there's like.... 2 exceptions to this rule)
+forrest07/30/2020
+setting up a long suit when you don't have transportation
+and?
+chuhchung07/30/2020
+endplay
+1 trump out, you merrily go on your way, he never ruffs in, the hand is stripped
+ok, here you go! your turn
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;  &lt;/div&gt;
+&lt;/details&gt;
+
+&lt;details&gt;
+  &lt;summary&gt;Hand 5
+  &lt;/summary&gt;
+
+  &lt;iframe src=&quot;https://www.bridgebase.com/tools/handviewer.html?bbo=y&amp;amp;lin=pn|Forrest_,kristinebe,granola357,MT982|st%7C%7Cmd%7C3SA32HATDKJ854CAK6%2CSJ9HKQ9432DATCQ43%2CSQ654HJ86DQ7CJT82%2C%7Crh%7C%7Cah%7CBoard%205%7Csv%7Cn%7Cmb%7Cp%7Cmb%7Cp%7Cmb%7C1D%7Cmb%7C1H%7Cmb%7C1S%7Cmb%7Cp%7Cmb%7C4S%7Cmb%7Cp%7Cmb%7Cp%7Cmb%7Cp%7Cpc%7CH5%7Cpc%7CHA%7Cpc%7CH9%7Cpc%7CH6%7Cpc%7CCA%7Cpc%7CC3%7Cpc%7CC2%7Cpc%7CC5%7Cpc%7CD4%7Cpc%7CDA%7Cpc%7CD7%7Cpc%7CD2%7Cpc%7CHK%7Cpc%7CH8%7Cpc%7CH7%7Cpc%7CHT%7Cpc%7CS9%7Cpc%7CSQ%7Cpc%7CSK%7Cpc%7CSA%7Cpc%7CD5%7Cpc%7CDT%7Cpc%7CDQ%7Cpc%7CD3%7Cpc%7CS4%7Cpc%7CS7%7Cpc%7CS2%7Cpc%7CSJ%7Cpc%7CHQ%7Cpc%7CHJ%7Cpc%7CS8%7Cpc%7CC6%7Cpc%7CST%7Cpc%7CS3%7Cpc%7CH2%7Cpc%7CS5%7Cpc%7CD6%7Cpc%7CDK%7Cpc%7CH3%7Cpc%7CC8%7Cpc%7CDJ%7Cpc%7CH4%7Cpc%7CCT%7Cpc%7CD9%7Cpc%7CCK%7Cpc%7CC4%7Cpc%7CCJ%7Cpc%7CC7%7Cpc%7CD8%7Cpc%7CCQ%7Cpc%7CS6%7Cpc%7CC9%7C&quot; height=&quot;480&quot; width=&quot;720&quot; allowfullscreen=&quot;allowfullscreen&quot;&gt; 
+    &lt;/iframe&gt;
+  &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;forrest07/30/2020
+Supposed to be :double: or :pass:?
+pretty ugly 6
+chuhchung07/30/2020
+i would pass
+your hand can stand to bid :3S: btw
+18-19 bal opposite partner's 1 level response can just raise to 3
+forrest07/30/2020
+so we discussed responding light a bit
+but i guess was thinking responding over their overcall wouldn't be light
+chuhchung07/30/2020
+yes
+forrest07/30/2020
+so therefore 19 should bid game
+but it can still be thin
+chuhchung07/30/2020
+oh, yeah
+but otherwise just bid 3 :stuck_out_tongue:
+forrest07/30/2020
+:thumbsup:
+chuhchung07/30/2020
+honestly i would probably still bid 3 here just to give partner an out
+¯\_(ツ)_/¯
+but it's fine
+forrest07/30/2020
+yeah doubtful to miss
+worst case is like 7 points or something
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;  &lt;/div&gt;
+&lt;/details&gt;
+
+&lt;details&gt;
+  &lt;summary&gt;Hand 6
+  &lt;/summary&gt;
+
+  &lt;iframe src=&quot;https://www.bridgebase.com/tools/handviewer.html?bbo=y&amp;amp;lin=pn|Forrest_,kristinebe,granola357,MT982|st%7C%7Cmd%7C4SA762HA92DAKJTCJ4%2CSJHQJT874DQ42CKT6%2CSKQ8543HD9865CA52%2C%7Crh%7C%7Cah%7CBoard%206%7Csv%7Ce%7Cmb%7Cp%7Cmb%7C1N%7Cmb%7C2H%7Can%7Cnatural--long%20suit%7Cmb%7C4S%7Cmb%7Cp%7Cmb%7Cp%7Cmb%7Cp%7Cpc%7CHK%7Cpc%7CHA%7Cpc%7CH7%7Cpc%7CC2%7Cpc%7CSA%7Cpc%7CSJ%7Cpc%7CS3%7Cpc%7CS9%7Cpc%7CS2%7Cpc%7CH4%7Cpc%7CSK%7Cpc%7CST%7Cpc%7CD5%7Cpc%7CD3%7Cpc%7CDJ%7Cpc%7CDQ%7Cpc%7CHQ%7Cpc%7CS4%7Cpc%7CH3%7Cpc%7CH2%7Cpc%7CD6%7Cpc%7CD7%7Cpc%7CDA%7Cpc%7CD2%7Cpc%7CDK%7Cpc%7CD4%7Cpc%7CD8%7Cpc%7CH5%7Cpc%7CDT%7Cpc%7CH8%7Cpc%7CD9%7Cpc%7CH6%7Cpc%7CC4%7Cpc%7CCT%7Cpc%7CCA%7Cpc%7CC3%7Cmc%7C11%7C&quot; height=&quot;480&quot; width=&quot;720&quot; allowfullscreen=&quot;allowfullscreen&quot;&gt; 
+    &lt;/iframe&gt;
+  &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;forrest07/30/2020
+Chat was advocating that texas should always be on
+idk if we even play texas normally yet
+currently we just play natural over interference
+chuhchung07/30/2020
+lol. thanks stream monsters.
+go to hell
+and texas is definitely NEVER always on
+standard is that it is off if :4D: is a cuebid
+like they interfere with 3D
+:4H: is NOT texas, because :4D: is not texas
+btw have i mentioned that in my system, we have a unified way of handling ALL of these scenarios, in a consistent, logical, memorable way?
+:money_mouth: :money_mouth: :money_mouth:
+forrest07/30/2020
+transfers?
+chuhchung07/30/2020
+yeah
+anyway, :4S: was fine
+mark can get a little vig by drawing trumps ending in dummy so he can cash one high diamond
+might as well not blow it to stiff DQ off
+or draw trumps ending in hand and cash a high diamond. whatever.
+forrest07/30/2020
+right
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;  &lt;/div&gt;
+&lt;/details&gt;
+
+&lt;details&gt;
+  &lt;summary&gt;Hand 7
+  &lt;/summary&gt;
+
+  &lt;iframe src=&quot;https://www.bridgebase.com/tools/handviewer.html?bbo=y&amp;amp;lin=pn|Forrest_,ashishgupt,granola357,shazamm|st%7C%7Cmd%7C1SQ863HQ5DKT97CKQJ%2CSJ7H76432DQJ3C986%2CSAT54HKJT9D42CA54%2C%7Crh%7C%7Cah%7CBoard%207%7Csv%7Cb%7Cmb%7C1D%7Cmb%7Cp%7Cmb%7C1H%7Cmb%7Cp%7Cmb%7C1S%7Cmb%7Cp%7Cmb%7C4S%7Cmb%7Cp%7Cmb%7Cp%7Cmb%7Cp%7Cpc%7CC9%7Cpc%7CC4%7Cpc%7CC7%7Cpc%7CCK%7Cpc%7CHQ%7Cpc%7CH2%7Cpc%7CH9%7Cpc%7CHA%7Cpc%7CC2%7Cpc%7CCQ%7Cpc%7CC6%7Cpc%7CCA%7Cpc%7CHK%7Cpc%7CH8%7Cpc%7CH5%7Cpc%7CH3%7Cpc%7CHJ%7Cpc%7CS2%7Cpc%7CS3%7Cpc%7CH4%7Cpc%7CCJ%7Cpc%7CC8%7Cpc%7CC5%7Cpc%7CC3%7Cpc%7CS6%7Cpc%7CS7%7Cpc%7CSA%7Cpc%7CS9%7Cpc%7CHT%7Cpc%7CD5%7Cpc%7CD7%7Cpc%7CH6%7Cpc%7CS4%7Cpc%7CSK%7Cpc%7CS8%7Cpc%7CSJ%7Cpc%7CDA%7Cpc%7CD9%7Cpc%7CD3%7Cpc%7CD2%7Cpc%7CD6%7Cpc%7CDK%7Cpc%7CDJ%7Cpc%7CD4%7Cpc%7CSQ%7Cpc%7CH7%7Cpc%7CS5%7Cpc%7CD8%7Cpc%7CDT%7Cpc%7CDQ%7Cpc%7CST%7Cpc%7CCT%7C&quot; height=&quot;480&quot; width=&quot;720&quot; allowfullscreen=&quot;allowfullscreen&quot;&gt; 
+    &lt;/iframe&gt;
+  &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;forrest07/30/2020
+i stripped the hand
+was maybe a little sketchy
+was planning to pitch diamonds on the hearts
+chuhchung07/30/2020
+i would be worried about giving up the club ruffj
+i don't think pitching two diamonds helps you much right
+forrest07/30/2020
+i guess i was worried about needing ruffs
+but the hearts are good enough
+chuhchung07/30/2020
+you're just gonna fail no matter what if the DA is offside
+lose at least 1 spade, 1 heart, two diamonds
+so we'll just play as if diamonds behave. similary, we need spades to behave... haha
+so i would just start SA and another immediately and pray
+forrest07/30/2020
+:thumbsup:
+chuhchung07/30/2020
+aiming3 spade tricks, 1 ruff is 4, 3 hearts is 7, 3 clubs is 10, diamond is 11 (except all those losers)
+forrest07/30/2020
+so i'd bid 4 with Mark's hand as well
+chuhchung07/30/2020
+yeah it's fine
+forrest07/30/2020
+but say he were 4333
+is it just an invite then?
+i guess the bidding would be different
+chuhchung07/30/2020
+yeah
+inviting is probably fine
+it's not that important
+haha
+the real question would be, how d owe get to 3N vs 4M when it's right
+forrest07/30/2020
+i assume 4SF is the normal answer
+we haven't really covered that
+chuhchung07/30/2020
+i don't even know if that wil help
+just throw my hands in the air and guess
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;  &lt;/div&gt;
+&lt;/details&gt;
+
+&lt;details&gt;
+  &lt;summary&gt;Hand 8
+  &lt;/summary&gt;
+
+  &lt;iframe src=&quot;https://www.bridgebase.com/tools/handviewer.html?bbo=y&amp;amp;lin=pn|Forrest_,ashishgupt,granola357,shazamm|st%7C%7Cmd%7C2S953HA7DJT75CAKJ5%2CSK2HQT4DKQ943CT74%2CSAQJ74HKJ85DA2C83%2C%7Crh%7C%7Cah%7CBoard%208%7Csv%7Co%7Cmb%7Cp%7Cmb%7C1S%7Cmb%7Cp%7Cmb%7C2C%7Cmb%7C2D%7Cmb%7C2H%7Cmb%7Cp%7Cmb%7C4S%7Cmb%7Cp%7Cmb%7Cp%7Cmb%7Cp%7Cpc%7CD8%7Cpc%7CD5%7Cpc%7CD3%7Cpc%7CDA%7Cpc%7CH5%7Cpc%7CH6%7Cpc%7CHA%7Cpc%7CH4%7Cpc%7CH7%7Cpc%7CHT%7Cpc%7CHJ%7Cpc%7CH2%7Cpc%7CH8%7Cpc%7CH3%7Cpc%7CS3%7Cpc%7CHQ%7Cpc%7CS5%7Cpc%7CS2%7Cpc%7CSJ%7Cpc%7CS6%7Cpc%7CC3%7Cpc%7CC2%7Cpc%7CCA%7Cpc%7CC4%7Cpc%7CS9%7Cpc%7CSK%7Cpc%7CSA%7Cpc%7CS8%7Cpc%7CSQ%7Cpc%7CST%7Cpc%7CD7%7Cpc%7CD4%7Cpc%7CHK%7Cpc%7CH9%7Cpc%7CDT%7Cpc%7CD9%7Cpc%7CC8%7Cpc%7CC6%7Cpc%7CCK%7Cpc%7CC7%7Cpc%7CC5%7Cpc%7CCT%7Cpc%7CS4%7Cpc%7CC9%7Cpc%7CD2%7Cpc%7CD6%7Cpc%7CDJ%7Cpc%7CDQ%7Cpc%7CDK%7Cpc%7CS7%7Cpc%7CCQ%7Cpc%7CCJ%7C&quot; height=&quot;480&quot; width=&quot;720&quot; allowfullscreen=&quot;allowfullscreen&quot;&gt; 
+    &lt;/iframe&gt;
+  &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;forrest07/30/2020
+we played :4S: 6 hands in a row
+it's a good contract! .... sometimes
+chuhchung07/30/2020
+too bad you didn't murderize :2D:
+mark played it well!
+forrest07/30/2020
+wow i didn't notice how bad :2D: would be
+you get like 3 tricks at most or something
+chuhchung07/30/2020
+yes
+it's a suicidal call
+absolutelyinsane
+forrest07/30/2020
+so should Mark double?
+chuhchung07/30/2020
+standard forcing pass is that double is penalty so he would have to pass
+and then you can smack it
+but you can just invert it. double is takeout
+tada
+forrest07/30/2020
+haha
+chuhchung07/30/2020
+bridge bidding is medieval
+forrest07/30/2020
+well we aren't in a game force
+if it matters
+chuhchung07/30/2020
+you're still in a force
+there's no way you can let your opponents play 2m with 23+ hcp in a forcing auction
+forrest07/30/2020
+right
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;  &lt;/div&gt;
+&lt;/details&gt;
+
+&lt;details&gt;
+  &lt;summary&gt;Hand 9
+  &lt;/summary&gt;
+
+  &lt;iframe src=&quot;https://www.bridgebase.com/tools/handviewer.html?bbo=y&amp;amp;lin=pn|Forrest_,srpj,granola357,REINAE|st%7C%7Cmd%7C3SQ2HKJ98DAJ953CA3%2CSA83HDKT862CK7652%2CSJ9764HAT743DQ7C8%2C%7Crh%7C%7Cah%7CBoard%209%7Csv%7Ce%7Cmb%7Cp%7Cmb%7Cp%7Cmb%7C1D%7Cmb%7Cp%7Cmb%7C1S%7Cmb%7Cp%7Cmb%7C1N%7Cmb%7Cp%7Cmb%7C2H%7Cmb%7Cp%7Cmb%7C3H%7Cmb%7Cp%7Cmb%7Cp%7Cmb%7Cp%7Cpc%7CD4%7Cpc%7CD3%7Cpc%7CDK%7Cpc%7CD7%7Cpc%7CSA%7Cpc%7CS4%7Cpc%7CST%7Cpc%7CS2%7Cpc%7CD2%7Cpc%7CDQ%7Cpc%7CH2%7Cpc%7CD5%7Cpc%7CSK%7Cpc%7CSQ%7Cpc%7CS3%7Cpc%7CS6%7Cpc%7CCQ%7Cpc%7CCA%7Cpc%7CC7%7Cpc%7CC8%7Cpc%7CHK%7Cpc%7CC2%7Cpc%7CH3%7Cpc%7CH5%7Cpc%7CHJ%7Cpc%7CC5%7Cpc%7CH4%7Cpc%7CHQ%7Cpc%7CCJ%7Cpc%7CC3%7Cpc%7CC6%7Cpc%7CHT%7Cpc%7CHA%7Cpc%7CH6%7Cpc%7CH8%7Cpc%7CS8%7Cpc%7CS7%7Cpc%7CS5%7Cpc%7CH9%7Cpc%7CCK%7Cpc%7CDA%7Cpc%7CD6%7Cpc%7CS9%7Cpc%7CC4%7Cpc%7CDJ%7Cpc%7CD8%7Cpc%7CSJ%7Cpc%7CC9%7Cpc%7CD9%7Cpc%7CDT%7Cpc%7CH7%7Cpc%7CCT%7C&quot; height=&quot;480&quot; width=&quot;720&quot; allowfullscreen=&quot;allowfullscreen&quot;&gt; 
+    &lt;/iframe&gt;
+  &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;forrest07/30/2020
+I should just open this :1N: right?
+chuhchung07/30/2020
+yes
+forrest07/30/2020
+are there any clues i missed on how to play hearts?
+i guess i know E has a singlton diamond
+so that's a pretty big tilt in that direction
+but since they did ruff, playing for the drop works in every case except 0-4 w/ E
+oh no could be 3-1
+but if they are 3-1 i can play the HK
+and learn that
+chuhchung07/30/2020
+there's a simple answer to this :slight_smile:
+i just won't play E for two singletons
+so cash HA
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;  &lt;/div&gt;
+&lt;/details&gt;</content><author><name></name></author><category term="bridge" /><category term="quicktricks" /><summary type="html">Unfortunately the VOD didn’t survive.</summary></entry></feed>
