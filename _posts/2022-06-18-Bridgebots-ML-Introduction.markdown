@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Bridgebots ML: Introduction"
-date: 2022-06-18 23:30:09 -0700
+date:   2022-06-18 23:00:09 -0700
 categories: bridge bridgebots machine-learning
 ---
 
@@ -47,10 +47,10 @@ The team that won the auction will have one of their players (the declarer) make
 ## Bridge ML
 ![bridge ML logo](/assets/bridge/bridgebots/bridge_nn_with_shared_connections_small.png)
 
-I have not yet merged the code referenced below into the main Bridgebots repository, but you can find it on this [branch](https://github.com/forrestrice/bridge-bots/tree/vugraph-project-sequence-learning) or see the diff in this [pull request](https://github.com/forrestrice/bridge-bots/pull/14).
-
 ### Gathering Data
 Following the roadmap that I laid out above, the first step to training a supervised learning model is to collect data. There are a few different sites that host bridge data, but for this project I decided to use records from [The Vugraph Project](https://www.sarantakos.com/bridge/vugraph.html). It has records from dozens of high level tournaments across many years of bridge. My hope is that if our models can understand this data, then they will be able to handle a wide variety of bridge situations. The data can be downloaded fairly simply with [wget](https://www.gnu.org/software/wget/manual/html_node/index.html) using the [recursive flag](https://www.gnu.org/software/wget/manual/html_node/Recursive-Retrieval-Options.html). The data is in LIN file format; luckily the [Bridgebots core library](https://github.com/forrestrice/bridge-bots/tree/master/bridgebots) can already [handle that](/posts/Introducting-Bridgebots-Part-3). I created two datasets - one which can contain the same deal multiple times, and one which has a unique bidding/play record for each deal.
+
+I have not yet merged the code used in this blog post into the main Bridgebots repository, but you can find it on this [branch](https://github.com/forrestrice/bridge-bots/tree/vugraph-project-sequence-learning) or see the diff in this [pull request](https://github.com/forrestrice/bridge-bots/pull/14).
 
 ### Labeling
 Now that we have downloaded a few thousand deals, we need to decide which targets we want our model to predict. For my first project, I decided to focus on the auction. At each player's turn to act, I want to predict three things:
@@ -74,16 +74,22 @@ Features I wrote but have not yet included because I am not sure of their validi
 1. Which bids were alerted.
 2. Which bids were explained.
 
-I have also given some thought about how to represent a partnership's bidding system to the model. My eventual hope is to use [embeddings](https://en.wikipedia.org/wiki/Embedding) to allow the model to take specific information about players or systems into account. Alternatively, we could devise a way to pass structured information with the bid (e.g. 3+ clubs, 10+ HCP for an opening of 1C for a partnership playing standard, 16+ HCP for a partnership playing precision).
+I have also given some thought about how to represent a partnership's bidding system to the model. My eventual hope is to use [embeddings](https://en.wikipedia.org/wiki/Embedding) to allow the model to take specific information about players or systems into account. Alternatively, we could devise a way to pass structured information with the bid (e.g. 3+ clubs, 10+ HCP for an opening of 1C for a partnership playing standard, 16+ HCP for a partnership playing precision). For now, all these models have no knowledge of the players or systems, so they treat every auction the same.
 
 ### Model Training and Iteration
-I am still in the process of training these models. There are many different techniques and architectures that can be used. The auction is a sequence of actions, so we can use models that specialize in handling sequential data like [LSTMs](https://en.wikipedia.org/wiki/Long_short-term_memory) and [Transformers](https://en.wikipedia.org/wiki/Transformer_(machine_learning_model)) to make predictions based on the history so far. For the task of predicting the next bid, we can use classification metrics to measure the performance of our model. These include [categorical crossentropy](https://en.wikipedia.org/wiki/Cross_entropy), [precision](https://en.wikipedia.org/wiki/Precision_and_recall), and [recall](https://en.wikipedia.org/wiki/Precision_and_recall) but there are [many more](https://en.wikipedia.org/wiki/Evaluation_of_binary_classifiers). For the task of predicting the players' shapes or HCP, we can use a regression based model. This will predict some average value (e.g. median or mean depending on the loss function used to train), but we could also augment the model to predict other aspects of the target distribution (e.g. standard deviation could tell us how wide of a range of HCP is expected for a bid). For this work I used [Tensorflow](https://www.tensorflow.org/), a popular Machine Learning library developed by Google.
+I am still in the process of training these models. There are many different techniques and architectures that can be used. The auction is a sequence of actions, so we can use models that specialize in handling sequential data like [LSTMs](https://en.wikipedia.org/wiki/Long_short-term_memory) and [Transformers](https://en.wikipedia.org/wiki/Transformer_(machine_learning_model)) to make predictions based on the history so far. 
+
+For the task of predicting the next bid, we can use classification metrics to measure the performance of our model. These include [categorical crossentropy](https://en.wikipedia.org/wiki/Cross_entropy), [precision](https://en.wikipedia.org/wiki/Precision_and_recall), and [recall](https://en.wikipedia.org/wiki/Precision_and_recall) but there are [many more](https://en.wikipedia.org/wiki/Evaluation_of_binary_classifiers). 
+
+For the task of predicting the players' shapes or HCP, we can use a regression based model. This will predict some average value (e.g. median or mean depending on the loss function used to train), but we could also augment the model to predict other aspects of the target distribution (e.g. standard deviation could tell us how wide of a range of HCP is expected for a bid). 
+
+For this work I used [Tensorflow](https://www.tensorflow.org/), a popular Machine Learning library developed by Google.
 
 ### Releasing a Model
-I spent some time building a saving/loading mechanism that will bundle the features needed by the model with the model internals (weights + structure). A user will be able to download these models and run them locally using the Bridgebots Python library. These models are far from perfect, but as you will see below, they already see that have some promise. Even when they are not provided with any system/partnership information, they make fairly reasonable predictions about the auction and holdings of the players. Like the rest of Bridgebots, the models and the code used to train them will be released under the [MIT Open Source License](https://en.wikipedia.org/wiki/MIT_License), which means they will be freely available for anyone to use or modify.
+I spent some time building a saving/loading mechanism that will bundle the features needed by the model with the model internals (weights + structure). A user can download these models and run them locally using the Bridgebots Python library. These models are far from perfect, but as you will see below, they already see that have some promise. Even when they are not provided with any system/partnership information, they make fairly reasonable predictions about the auction and holdings of the players. Like the rest of Bridgebots, the models and the code used to train them will be released under the [MIT Open Source License](https://en.wikipedia.org/wiki/MIT_License), which means they will be freely available for anyone to use or modify.
 
 ## Examples
-I have published the first generation of these models to a [public GCP storage bucket](https://console.cloud.google.com/storage/browser/bridgebots-public;tab=objects?prefix=&forceOnObjectsSortingFiltering=false).
+I have published the first generation of these models to a [public GCP storage bucket](https://console.cloud.google.com/storage/browser/bridgebots-public;tab=objects?prefix=&forceOnObjectsSortingFiltering=false), and I built an example [Google Colab notebook](https://colab.research.google.com/drive/1DoW2cVw8IBS5DoOgajcVd-jD4p785pIP?usp=sharing) which shows how they can be loaded and run.
 
 ### Loading the Model
 The models can be loaded by installing the bridgebots-sequence package.
@@ -141,7 +147,7 @@ WEST - HCP:7.195767402648926, Shape:[4.8077374 3.1735537 2.7231622 2.2366753]
 Predicted bid: 3C
 Predicted bid probabilities:[('3C', 0.27392504), ('2NT', 0.2338383), ('3D', 0.18260154), ('PASS', 0.10459597), ('3H', 0.06501402)]
 ```
-The model did well understanding that W held spades after they opened a multi 2D, and that N would bid 3C (27%) or 2NT (23%), both of which were suggested by the commentators. The model struggled with the fact that East's 2S actually showed a preference for hearts, and overestimated South's strength. 
+The model did well understanding that West held spades after they opened a multi 2D, and that North would bid 3C (27%) or 2NT (23%), both of which were suggested by the commentators. The model struggled with the fact that East's 2S actually showed a preference for hearts, and overestimated South's strength. 
 
 ### Board 31
 ![board 31](/assets/bridge/bridgebots/dot_31.png)
